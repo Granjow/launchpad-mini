@@ -62,10 +62,19 @@ pad.connect().then( ( msg ) => {
     }
 
     // Reset pad
-    pad.reset( 2 );
-    pad.col( Launchpad.GreenLow, [ 0, 0 ] );
-    pad.col( Launchpad.GreenLow, [ [ 1, 1 ], [ 7, 6 ], [ 8, 7 ] ] );
-    pad.multiplexing();
+    pad.reset(  );
+    pad.col( Launchpad.GreenFull, pad.fromMap(
+        '-x----x-o' +
+        'x-x--xxxo' +
+        'x-x--xxxo' +
+        '--------o' +
+        '--------o' +
+        '-x----x-o' +
+        '--xxxx--o' +
+        '---------' +
+        'oooxxooo '
+    ) );
+    pad.multiplexing(1,10);
 
     // Esc button
     pad.col( Launchpad.RedFull, [ 0, 8 ] );

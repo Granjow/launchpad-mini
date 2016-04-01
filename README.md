@@ -1,4 +1,4 @@
-JavaScript library for interacting with the [Novation Launchpad Mini](https://global.novationmusic.com/launch/launchpad-mini).
+JavaScript library for interacting with the Novation Launchpad Mini.
 
 Other node.js libraries exist, which you may want to consider as well, like:
 
@@ -12,6 +12,8 @@ I am writing this yet-another-lauchpad-library because:
 * midi-launchpad works, but is no longer maintained
 * launchpadder works as well and is simple, but does not provide double-buffering
 
+![Sample](img/smile.jpg)
+
 ## Usage
 
     const Launchpad = require( 'launchpad-mini' ),
@@ -20,6 +22,8 @@ I am writing this yet-another-lauchpad-library because:
         .then( () => pad.reset( 2 ) );  // Make Launchpad glow yellow
 
 ## Documentation
+
+Product page: [Novation Launchpad Mini](https://global.novationmusic.com/launch/launchpad-mini)
 
 Novation provides a reference on [their download page](https://global.novationmusic.com/support/product-downloads?product=Launchpad)
 (direct link: [Launchpad MK2 Programmer’s Reference Manual](https://global.novationmusic.com/sites/default/files/novation/downloads/10529/launchpad-mk2-programmers-reference-guide_0.pdf))
@@ -63,7 +67,7 @@ The documentation below is mainly an overview and not equally precise.
 
 ### Events
 
-The launchpad object sends out events using the (Node.js EventEmitter)[https://nodejs.org/dist/latest-v5.x/docs/api/events.html].
+The launchpad object sends out events using the [Node.js EventEmitter](https://nodejs.org/dist/latest-v5.x/docs/api/events.html).
 Subscribe with e.g.
 
     pad.on( 'connect', () => console.log( 'Launchpad connected!' ) ); 
@@ -76,11 +80,11 @@ Emitted when connection to a Launchpad has been established.
 
 Emitted when the ports have been closed, usually after calling `pad.disconnect()`.
 
-#### `'key': (x: Number, y: Number, pressed: Boolean)`
+#### `'key': (x:Number, y:Number, pressed:Boolean)`
 
 Emitted when a key is pressed or released. Example usage:
 
-    pad.on( 'key', k => console.log( `Key ${k.x},${k.y} has been ${k.pressed ? 'pressed' : 'released'}`) );
+    pad.on( 'key', k => console.log( `Key ${k.x},${k.y} down: ${k.pressed}`) );
 
 ### Methods
 
@@ -114,9 +118,28 @@ a single button, or an array of such pairs. Example:
 
 A getter, which returns an array of `[x,y]` pairs of buttons which are currently pressed.
 
-#### `pad.multiplexing( num: Number, den: Number )`
+#### `pad.multiplexing( num:Number, den:Number )`
 
 Set the low/medium button brightness. Low brightness buttons are about `num/den` times as bright 
 as full brightness buttons. Medium brightness buttons are twice as bright as low brightness.
 
 Default is `1/5` when `num` and `den` are not given.
+
+#### `pad.fromMap( map:String ): Array`
+
+Generates a coordinate array from a string map, like the template for the picture on top:
+
+    pad.col( Launchpad.GreenFull, pad.fromMap(
+            '-x----x-o' +
+            'x-x--xxxo' +
+            'x-x--xxxo' +
+            '--------o' +
+            '--------o' +
+            '-x----x-o' +
+            '--xxxx--o' +
+            '---------' +
+            'oooxxooo '
+        ) );
+
+The string map is **9×9 characters** long without line breaks. All buttons with an `x` will be returned, all others
+will not. The map can be shorter, e.g. `-xx` would produce `[ [1,0], [2,0] ]`.

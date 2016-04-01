@@ -148,7 +148,9 @@ Launchpad.prototype = {
             buttons.forEach( btn => this.col( color, btn ) );
         } else {
             var b = this._button( buttons[ 0 ], buttons[ 1 ] );
-            this.sendRaw( [ b.cmd, b.key, color ] );
+            if ( b ) {
+                this.sendRaw( [ b.cmd, b.key, color ] );
+            }
         }
     },
 
@@ -171,6 +173,28 @@ Launchpad.prototype = {
             data = 0x10 * (num - 9) + (den - 3);
         }
         this.sendRaw( [ 0xb0, cmd, data ] );
+    },
+
+    /**
+     * Generate an array of coordinate pairs from a string “painting”. The input string is 9×9 characters big
+     * and starts with the first button row (including the scene buttons on the right). The last row is for the 
+     * Automap buttons which are in reality on top on the Launchpad.
+     * 
+     * Any character which is a lowercase 'x' will be returned in the coordinate array.
+     *
+     * The generated array can be used for setting button colours, for example.
+     * 
+     * @param {String} map
+     * @returns {Array.<Array.<Number>>} Array containing [x,y] coordinate pairs.
+     */
+    fromMap: function ( map ) {
+        return Array.prototype.map.call( map, ( char, ix ) => ({
+                x: ix % 9,
+                y: (ix - (ix % 9)) / 9,
+                c: char
+            }) )
+            .filter( data => data.c === 'x' )
+            .map( data => [ data.x, data.y ] );
     },
 
     /**
