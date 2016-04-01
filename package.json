@@ -1,6 +1,6 @@
 {
   "name": "launchpad-mini",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author":"Simon A. Eugster <simon.eu@gmail.com>",
   "dependencies": {
     "midi": "^0.9.4"

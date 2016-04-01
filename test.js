@@ -62,9 +62,10 @@ pad.connect().then( ( msg ) => {
     }
 
     // Reset pad
-    pad.reset( 3 );
+    pad.reset( 2 );
     pad.col( Launchpad.GreenLow, [ 0, 0 ] );
     pad.col( Launchpad.GreenLow, [ [ 1, 1 ], [ 7, 6 ], [ 8, 7 ] ] );
+    pad.multiplexing();
 
     // Esc button
     pad.col( Launchpad.RedFull, [ 0, 8 ] );
@@ -75,5 +76,4 @@ pad.connect().then( ( msg ) => {
         }
     } );
 
-    //setTimeout( () => pad.disconnect(), 10000 );
 }, err => console.error( 'Rejected: ', err ) );

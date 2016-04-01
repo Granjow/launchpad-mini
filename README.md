@@ -33,7 +33,21 @@ written by Novation, but for some reason it is not available on their web site.
 All methods are documented in the code, so your IDE should provide you with documentation and type annotation.
 The documentation below is mainly an overview and not equally precise.
 
-Colors: (Launchpad buttons are lit by a red and a green LED each; combined, they give Amber.)
+**Buttons:**
+
+        0 1 2 3 4 5 6 7 8 (x)
+     8  o o o o o o o o
+     0  [][][][][][][][] o
+     1  [][][][][][][][] o
+     2  [][][][][][][][] o
+     3  [][][][][][][][] o
+     4  [][][][][][][][] o
+     5  [][][][][][][][] o
+     6  [][][][][][][][] o
+     7  [][][][][][][][] o
+    (y)
+
+**Colors:** (Launchpad buttons are lit by a red and a green LED each; combined, they give Amber.)
 
 * `Launchpad.Off`
 * `Launchpad.RedLow`
@@ -99,3 +113,10 @@ a single button, or an array of such pairs. Example:
 #### `pad.pressedButtons`
 
 A getter, which returns an array of `[x,y]` pairs of buttons which are currently pressed.
+
+#### `pad.multiplexing( num: Number, den: Number )`
+
+Set the low/medium button brightness. Low brightness buttons are about `num/den` times as bright 
+as full brightness buttons. Medium brightness buttons are twice as bright as low brightness.
+
+Default is `1/5` when `num` and `den` are not given.

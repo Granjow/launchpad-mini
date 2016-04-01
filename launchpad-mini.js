@@ -43,8 +43,6 @@ const Launchpad = function () {
             return b;
         } );
 
-    console.log( this._buttons );
-
     return this;
 };
 Launchpad.prototype = {
@@ -152,6 +150,27 @@ Launchpad.prototype = {
             var b = this._button( buttons[ 0 ], buttons[ 1 ] );
             this.sendRaw( [ b.cmd, b.key, color ] );
         }
+    },
+
+    /**
+     * Set the low/medium button brightness. Low brightness buttons are about `num/den` times as bright
+     * as full brightness buttons. Medium brightness buttons are twice as bright as low brightness.
+     * @param {Number=} num Numerator, between 1 and 16, default=1
+     * @param {Number=} den Denominator, between 3 and 18, default=5
+     */
+    multiplexing: function ( num, den ) {
+        var data,
+            cmd;
+        num = Math.max( 1, Math.min( num || 1, 16 ) );
+        den = Math.max( 3, Math.min( den || 5, 18 ) );
+        if ( num < 9 ) {
+            cmd = 0x1e;
+            data = 0x10 * (num - 1) + (den - 3);
+        } else {
+            cmd = 0x1f;
+            data = 0x10 * (num - 9) + (den - 3);
+        }
+        this.sendRaw( [ 0xb0, cmd, data ] );
     },
 
     /**
