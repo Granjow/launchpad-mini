@@ -19,15 +19,29 @@ pad.connect().then( ( msg ) => {
     // OFF all LEDs
     pad.sendRaw( [ 0xb0, 0x00, 0x00 ] );
 
-    pad.sendRaw( [ 0x80, 0, 0 ] );
+    pad.sendRaw( [ 0x90, 0, 11 ] );
     pad.sendRaw( [ 0x90, 1, 3 ] );
     pad.sendRaw( [ 0x90, 2, 32 ] );
     pad.sendRaw( [ 0x90, 3, 35 ] );
 
-    // Top row: Autmap/Live buttons set with 0x0b (Scene Launch buttons on the right are just row 8)
+    pad.sendRaw( [ 0x90, 16, Launchpad.AmberLow ] );
+    pad.sendRaw( [ 0x90, 17, Launchpad.AmberMedium ] );
+    pad.sendRaw( [ 0x90, 18, Launchpad.AmberFull ] );
+    pad.sendRaw( [ 0x90, 19, Launchpad.YellowFull ] );
+
+    // Top row: Automap/Live buttons set with 0x0b (Scene Launch buttons on the right are just row 8)
     pad.sendRaw( [ 0xb0, 111, 32 ] );
     // pad.sendRaw( [ 0x90, 104+4, 32 ] );
     // pad.sendRaw( [ 0x90, 104+8, 32 ] );
+
+    pad.at( 4, 4 ).col( Launchpad.GreenFull );
+    pad.ats( [ 5, 5 ], [ 6, 6 ], [ 7, 7 ] ).forEach( button => button.col( Launchpad.RedFull ) );
+    pad.fromMap(
+        '------xx-' +
+        '-----xx--' +
+        '----xx---' +
+        '---xx----'
+    ).forEach( button => button.col( Launchpad.AmberLow ) );
 
     setTimeout( () => pad.disconnect(), 100 );
 }, err => console.error( 'Rejected: ', err ) );

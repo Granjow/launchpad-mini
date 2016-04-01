@@ -98,4 +98,28 @@ Launchpad.prototype = {
 util.inherits( Launchpad, EventEmitter );
 
 
+/**
+ * Generates a color by setting red and green LED power individually.
+ * @param {Number} r Red brightness, 0 (off) to 3 (max)
+ * @param {Number} g Green brightness, 0 (off) to 3 (max)
+ * @param {String=} mode Can be 'flash' for flashing LED or 'double' for double-buffering. Leave undefined for default mode.
+ * @return {Number}
+ */
+Launchpad.color = ( r, g, mode ) => 16 * g + r + 12 * (!mode) + 8 * (mode === 'flash');
+
+/**
+ * List of default colors.
+ */
+Launchpad.Off = Launchpad.color( 0, 0 );
+Launchpad.RedLow = Launchpad.color( 1, 0 );
+Launchpad.RedMedium = Launchpad.color( 2, 0 );
+Launchpad.RedFull = Launchpad.color( 3, 0 );
+Launchpad.GreenLow = Launchpad.color( 0, 1 );
+Launchpad.GreenMedium = Launchpad.color( 0, 2 );
+Launchpad.GreenFull = Launchpad.color( 0, 3 );
+Launchpad.AmberLow = Launchpad.color( 1, 1 );
+Launchpad.AmberMedium = Launchpad.color( 2, 2 );
+Launchpad.AmberFull = Launchpad.color( 2, 3 );
+Launchpad.YellowFull = Launchpad.color( 1, 3 );
+
 module.exports = Launchpad;
