@@ -16,7 +16,8 @@ I am writing this yet-another-lauchpad-library because:
 
     const Launchpad = require( 'launchpad-mini' ),
           pad = new Launchpad();
-    pad.connect(); // Auto-detect Launchpad
+    pad.connect()                       // Auto-detect Launchpad
+        .then( () => pad.reset( 2 ) );  // Make Launchpad glow yellow
 
 ## Documentation
 
@@ -28,6 +29,23 @@ For the Launchpad Mini, see the Programmer’s Manual in this repository’s `do
 written by Novation, but for some reason it is not available on their web site.
 
 ## API
+
+All methods are documented in the code, so your IDE should provide you with documentation and type annotation.
+The documentation below is mainly an overview and not equally precise.
+
+Colors: (Launchpad buttons are lit by a red and a green LED each; combined, they give Amber.)
+
+* `Launchpad.Off`
+* `Launchpad.RedLow`
+* `Launchpad.RedMedium`
+* `Launchpad.RedFull`
+* `Launchpad.GreenLow`
+* `Launchpad.GreenMedium`
+* `Launchpad.GreenFull`
+* `Launchpad.AmberLow`
+* `Launchpad.AmberMedium`
+* `Launchpad.AmberFull`
+* `Launchpad.YellowFull`
 
 ### Events
 
@@ -52,7 +70,32 @@ Emitted when a key is pressed or released. Example usage:
 
 ### Methods
 
+#### `pad.connect( port:Number ): Promise`
+
+Connects to the launchpad. The port can optionally be specified; if not given, the first Launchpad that is found
+is taken.
+
+#### `pad.disconnect()`
+
+Disconnect.
+
+#### `pad.availablePorts`
+
+A getter which returns available MIDI ports where a Launchpad is connected (other MIDI devices are not returned).
+Probably useful if you have more than one Launchpad connected.
+
 #### `pad.reset( brightness:Number )`
 
 Resets the pad's mapping mode, buffer settings, and duty cycle. The optional `brightness` parameter sets all LEDs 
 to the defined brightness between `1` (low) and `3` (high), other values switch the LEDs off.
+
+#### `pad.col( color:Number, buttons:Array )`
+
+Sets the color for the given buttons. The `buttons` parameter is either a value pair `[0,0]` to `[8,8]` specifying 
+a single button, or an array of such pairs. Example:
+
+    pad.col( Launchpad.GreenFull, [ [0,0], [1,1], [2,2] ] );
+
+#### `pad.pressedButtons`
+
+A getter, which returns an array of `[x,y]` pairs of buttons which are currently pressed.

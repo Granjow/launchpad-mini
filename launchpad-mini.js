@@ -30,13 +30,20 @@ const Launchpad = function () {
 
     this.midiIn.on( 'message', ( dt, msg ) => this._processMessage( dt, msg ) );
 
-    /** @type {Array.<{pressed:Boolean, x:Number, y:Number}>} */
+    /** @type {Array.<{pressed:Boolean, x:Number, y:Number, cmd:Number, key:Number}>} */
     this._buttons = (new Array( 9 * 9 - 1 )).fill( 0 )
         .map( ( el, ix ) => ({
             pressed: false,
             y: (ix - ix % 9) / 9,
             x: ix % 9
-        }) );
+        }) )
+        .map( b => {
+            b.cmd = b.y >= 8 ? 0xb0 : 0x90;
+            b.key = b.y >= 8 ? 0x68 + b.x : 0x10 * b.y + b.x;
+            return b;
+        } );
+
+    console.log( this._buttons );
 
     return this;
 };
@@ -101,8 +108,9 @@ Launchpad.prototype = {
     },
 
     /**
+     * Can be used if multiple Launchpads are connected.
      * @returns {{input: Array.<{portNumber:Number, portName:String}>, output: Array.<{portNumber:Number, portName:String}>}}
-     * Available input and output ports with a connected Launchpad
+     * Available input and output ports with a connected Launchpad; no other MIDI devices are shown.
      */
     get availablePorts() {
         return {
@@ -121,7 +129,33 @@ Launchpad.prototype = {
     },
 
     /**
-     * @returns {{pressed: Boolean, x: Number, y: Number}} Button at given coordinates
+     * Check if a button is pressed.
+     * @param {Number} x
+     * @param {Number} y
+     * @returns {boolean}
+     */
+    isPressed: function ( x, y ) {
+        return this._buttons.some( b => b.pressed && b.x === x && b.y === y );
+    },
+
+    /**
+     * Set the specified color for the given LED(s).
+     * @param {Number} color
+     * @param {Array.<Number>|Array.<Array.<Number>>} buttons [x,y] value pair, or array of pairs
+     */
+    col: function ( color, buttons ) {
+        // Code would look much better with the Rest operator ...
+
+        if ( buttons.length > 0 && buttons[ 0 ] instanceof Array ) {
+            buttons.forEach( btn => this.col( color, btn ) );
+        } else {
+            var b = this._button( buttons[ 0 ], buttons[ 1 ] );
+            this.sendRaw( [ b.cmd, b.key, color ] );
+        }
+    },
+
+    /**
+     * @returns {{pressed: Boolean, x: Number, y: Number, cmd:Number, key:Number}} Button at given coordinates
      */
     _button: function ( x, y ) {
         return this._buttons[ 9 * y + x ];

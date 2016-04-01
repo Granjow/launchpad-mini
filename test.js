@@ -53,26 +53,21 @@ pad.connect().then( ( msg ) => {
 
         // Want to use double buffering for setting many button colours at once
         // Want to efficiently update multiple buttons with rapid fire
-        pad.col( [ [ 0, 4 ], [ 1, 5 ], [ 2, 6 ], [ 3, 7 ] ], Launchpad.YellowFull );
+        pad.col( Launchpad.YellowFull, [ [ 0, 4 ], [ 1, 5 ], [ 2, 6 ], [ 3, 7 ] ] );
 
         pad.col( Launchpad.GreenFull, pad.fromMap(
             'xxx--xxx '
         ) );
 
-        // Want to know state of a button
-        let isPressed;
-        isPressed = pad.at( 0, 0 ).pressed;
-        isPressed = pad.pressed( 0, 0 );
-        // and of multiple buttons
-        pad.ats( [ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ] ).forEach( b => console.log( `${b.x}|${b.y} pressed: ${b.pressed}` ) );
-        [ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ].forEach( pair => console.log( `Pressed: ${pad.pressed( pair )}` ) );
-
     }
 
     // Reset pad
     pad.reset( 3 );
-    pad.sendRaw( [ 0xb0, 104, Launchpad.RedFull ] );
+    pad.col( Launchpad.GreenLow, [ 0, 0 ] );
+    pad.col( Launchpad.GreenLow, [ [ 1, 1 ], [ 7, 6 ], [ 8, 7 ] ] );
 
+    // Esc button
+    pad.col( Launchpad.RedFull, [ 0, 8 ] );
     pad.on( 'key', pair => {
         if ( pair.x === 0 && pair.y === 8 && pair.pressed ) {
             pad.reset( 1 );
