@@ -78,6 +78,17 @@ Launchpad.prototype = {
         this.midiOut.closePort();
     },
 
+    /**
+     * Reset mapping mode, buffer settings, and duty cycle. Also turn all LEDs on or off.
+     *
+     * @param {Number=} brightness If given, all LEDs will be set to the brightness level (1 = low, 3 = high).
+     * If undefined, all LEDs will be turned off.
+     */
+    reset: function ( brightness ) {
+        brightness = brightness > 0 && brightness <= 3 ? brightness + 0x7c : 0;
+        this.sendRaw( [ 0xb0, 0x00, brightness ] )
+    },
+
     sendRaw: function ( data ) {
         this.midiOut.sendMessage( data );
     },
@@ -119,7 +130,7 @@ Launchpad.GreenMedium = Launchpad.color( 0, 2 );
 Launchpad.GreenFull = Launchpad.color( 0, 3 );
 Launchpad.AmberLow = Launchpad.color( 1, 1 );
 Launchpad.AmberMedium = Launchpad.color( 2, 2 );
-Launchpad.AmberFull = Launchpad.color( 2, 3 );
+Launchpad.AmberFull = Launchpad.color( 3, 3 );
 Launchpad.YellowFull = Launchpad.color( 1, 3 );
 
 module.exports = Launchpad;

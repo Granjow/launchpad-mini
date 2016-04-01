@@ -34,14 +34,30 @@ pad.connect().then( ( msg ) => {
     // pad.sendRaw( [ 0x90, 104+4, 32 ] );
     // pad.sendRaw( [ 0x90, 104+8, 32 ] );
 
-    pad.at( 4, 4 ).col( Launchpad.GreenFull );
-    pad.ats( [ 5, 5 ], [ 6, 6 ], [ 7, 7 ] ).forEach( button => button.col( Launchpad.RedFull ) );
-    pad.fromMap(
-        '------xx-' +
-        '-----xx--' +
-        '----xx---' +
-        '---xx----'
-    ).forEach( button => button.col( Launchpad.AmberLow ) );
+    if ( false ) {
+        pad.at( 4, 4 ).col( Launchpad.GreenFull );
+        pad.ats( [ 5, 5 ], [ 6, 6 ], [ 7, 7 ] ).forEach( button => button.col( Launchpad.RedFull ) );
 
-    setTimeout( () => pad.disconnect(), 100 );
+        // Want to easily select buttons
+        pad.fromMap(
+            '------xx-' +
+            '-----xx--' +
+            '----xx---' +
+            '---xx----'
+        ).forEach( button => button.col( Launchpad.AmberLow ) );
+
+        // Want to efficiently update multiple buttons with rapid fire
+        pad.col( [ [ 0, 4 ], [ 1, 5 ], [ 2, 6 ], [ 3, 7 ] ], Launchpad.YellowFull );
+
+        // Want to use double buffering for setting many button colours at once
+
+
+    }
+
+    // Reset pad
+    pad.reset();
+    setTimeout( () => pad.reset( Launchpad.HIGH ), 500 );
+
+
+    setTimeout( () => pad.disconnect(), 700 );
 }, err => console.error( 'Rejected: ', err ) );
