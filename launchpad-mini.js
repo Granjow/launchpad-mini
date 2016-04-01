@@ -28,9 +28,15 @@ const Launchpad = function () {
     this.midiIn = new midi.input();
     this.midiOut = new midi.output();
 
-    this.midiIn.on( 'message', ( deltaTime, message ) => {
-        console.log( 'm: ' + message + ' d: ' + deltaTime );
-    } );
+    this.midiIn.on( 'message', ( dt, msg ) => this._processMessage( dt, msg ) );
+
+    /** @type {Array.<{pressed:Boolean, x:Number, y:Number}>} */
+    this._buttons = (new Array( 9 * 9 - 1 )).fill( 0 )
+        .map( ( el, ix ) => ({
+            pressed: false,
+            y: (ix - ix % 9) / 9,
+            x: ix % 9
+        }) );
 
     return this;
 };
@@ -76,13 +82,14 @@ Launchpad.prototype = {
     disconnect: function () {
         this.midiIn.closePort();
         this.midiOut.closePort();
+        this.emit( 'disconnect' );
     },
 
     /**
      * Reset mapping mode, buffer settings, and duty cycle. Also turn all LEDs on or off.
      *
      * @param {Number=} brightness If given, all LEDs will be set to the brightness level (1 = low, 3 = high).
-     * If undefined, all LEDs will be turned off.
+     * If undefined (or any other number), all LEDs will be turned off.
      */
     reset: function ( brightness ) {
         brightness = brightness > 0 && brightness <= 3 ? brightness + 0x7c : 0;
@@ -97,11 +104,55 @@ Launchpad.prototype = {
      * @returns {{input: Array.<{portNumber:Number, portName:String}>, output: Array.<{portNumber:Number, portName:String}>}}
      * Available input and output ports with a connected Launchpad
      */
-    get
-        availablePorts() {
+    get availablePorts() {
         return {
             input: findLaunchpadPorts( this.midiIn ),
             output: findLaunchpadPorts( this.midiOut )
+        }
+    },
+
+    /**
+     * Get a list of buttons which are currently pressed.
+     * @returns {Array.<Array.<Number>>} Array containing [x,y] pairs of pressed buttons
+     */
+    get pressedButtons() {
+        return this._buttons.filter( b => b.pressed )
+            .map( b => [ b.x, b.y ] );
+    },
+
+    /**
+     * @returns {{pressed: Boolean, x: Number, y: Number}} Button at given coordinates
+     */
+    _button: function ( x, y ) {
+        return this._buttons[ 9 * y + x ];
+    },
+
+    _processMessage: function ( deltaTime, message ) {
+
+        if ( message[ 0 ] === 0x90 ) {
+
+            // Grid pressed
+            let x = message[ 1 ] % 0x10,
+                y = (message[ 1 ] - x) / 0x10,
+                pressed = message[ 2 ] > 0;
+
+            console.log( message[ 1 ], x, y );
+
+            this._button( x, y ).pressed = pressed;
+            this.emit( 'key', { x: x, y: y, pressed: pressed } );
+
+        } else if ( message[ 0 ] === 0xb0 ) {
+
+            // Automap/Live button
+            let x = message[ 1 ] - 0x68,
+                y = 8,
+                pressed = message[ 2 ] > 0;
+
+            this._button( x, y ).pressed = pressed;
+            this.emit( 'key', { x: x, y: y, pressed: pressed } );
+
+        } else {
+            console.log( `Unknown message: ${message} at ${deltaTime}` );
         }
     }
 
@@ -118,9 +169,8 @@ util.inherits( Launchpad, EventEmitter );
  */
 Launchpad.color = ( r, g, mode ) => 16 * g + r + 12 * (!mode) + 8 * (mode === 'flash');
 
-/**
- * List of default colors.
- */
+/// List of default colors.
+
 Launchpad.Off = Launchpad.color( 0, 0 );
 Launchpad.RedLow = Launchpad.color( 1, 0 );
 Launchpad.RedMedium = Launchpad.color( 2, 0 );

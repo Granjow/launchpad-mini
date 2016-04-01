@@ -5,12 +5,17 @@ const
 
 let pad = new Launchpad();
 
+pad.on( 'disconnect', () => console.log( 'Launchpad disconnected.' ) );
+pad.on( 'key', data => {
+    console.log( data );
+    console.log( 'Currently pressed: ', pad.pressedButtons );
+} );
+
 console.log( pad.availablePorts );
 
 pad.connect().then( ( msg ) => {
     console.log( msg );
 
-    console.log( 'Sending message ...' );
     // MIDI device inquiry
     // pad.sendRaw( [ 0xf0, 0x7e, 0x7f, 0x06, 0x01, 0xf7 ] );
 
@@ -46,18 +51,34 @@ pad.connect().then( ( msg ) => {
             '---xx----'
         ).forEach( button => button.col( Launchpad.AmberLow ) );
 
+        // Want to use double buffering for setting many button colours at once
         // Want to efficiently update multiple buttons with rapid fire
         pad.col( [ [ 0, 4 ], [ 1, 5 ], [ 2, 6 ], [ 3, 7 ] ], Launchpad.YellowFull );
 
-        // Want to use double buffering for setting many button colours at once
+        pad.col( Launchpad.GreenFull, pad.fromMap(
+            'xxx--xxx '
+        ) );
 
+        // Want to know state of a button
+        let isPressed;
+        isPressed = pad.at( 0, 0 ).pressed;
+        isPressed = pad.pressed( 0, 0 );
+        // and of multiple buttons
+        pad.ats( [ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ] ).forEach( b => console.log( `${b.x}|${b.y} pressed: ${b.pressed}` ) );
+        [ [ 1, 1 ], [ 2, 2 ], [ 3, 3 ] ].forEach( pair => console.log( `Pressed: ${pad.pressed( pair )}` ) );
 
     }
 
     // Reset pad
-    pad.reset();
-    setTimeout( () => pad.reset( Launchpad.HIGH ), 500 );
+    pad.reset( 3 );
+    pad.sendRaw( [ 0xb0, 104, Launchpad.RedFull ] );
 
+    pad.on( 'key', pair => {
+        if ( pair.x === 0 && pair.y === 8 && pair.pressed ) {
+            pad.reset( 1 );
+            pad.disconnect();
+        }
+    } );
 
-    setTimeout( () => pad.disconnect(), 700 );
+    //setTimeout( () => pad.disconnect(), 10000 );
 }, err => console.error( 'Rejected: ', err ) );
