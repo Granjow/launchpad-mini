@@ -1,8 +1,17 @@
 {
   "name": "launchpad-mini",
-  "version": "0.3.0",
-  "author":"Simon A. Eugster <simon.eu@gmail.com>",
+  "version": "0.3.1",
+  "author": "Simon A. Eugster <simon.eu@gmail.com>",
+  "main": "./launchpad-mini.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Granjow/launchpad-mini.git"
+  },
+  "homepage": "https://github.com/Granjow/launchpad-mini",
   "dependencies": {
     "midi": "^0.9.4"
+  },
+  "engines": {
+    "node": ">=5.0.0"
   }
 }
