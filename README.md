@@ -39,6 +39,14 @@ The documentation below is mainly an overview and not equally precise.
 
 **Buttons:**
 
+The Launchpad has
+
+* 8 round *Automap/Live Buttons* on top,
+* 8 round *Scene Buttons* on the right,
+* 64 square *Grid Buttons* on the main area.
+
+In code, the Automap buttons have column number 8 (not 0).
+
         0 1 2 3 4 5 6 7 8 (x)
      8  o o o o o o o o
      0  [][][][][][][][] o
@@ -90,9 +98,11 @@ Emitted when a key is pressed or released. An object of the following format is 
 
 Example usage:
 
-    pad.on( 'key', k => {
-        console.log( `Key ${k.x},${k.y} down: ${k.pressed}`);
-    } );
+```js
+pad.on( 'key', k => {
+    console.log( `Key ${k.x},${k.y} down: ${k.pressed}`);
+} );
+```
 
 ### Methods
 
@@ -116,6 +126,8 @@ Disconnect.
 A getter which returns available MIDI ports where a Launchpad is connected (other MIDI devices are not returned).
 Probably useful if you have more than one Launchpad connected.
 
+---
+
 #### pad.reset( brightness )
 
 Resets the pad's mapping mode, buffer settings, and duty cycle. The optional `brightness` parameter sets all LEDs 
@@ -130,16 +142,52 @@ a single button, or an array of such pairs. Example:
 
     pad.col( Launchpad.GreenFull, [ [0,0], [1,1], [2,2] ] );
 
+---
+
 #### pad.pressedButtons
 
 A getter, which returns an array of `[x,y]` pairs of buttons which are currently pressed.
 
-    pad.pressedButtons
-    // -> [ [0,0], [2,7] ]
+```js
+pad.pressedButtons
+// -> [ [0,0], [2,7] ]
+```
+
+---
+
+#### pad.brightness( brightness )
+
+Set the button brightness. Buttons have 3 brightness levels:
+
+* *full* — constant brightness, can be changed by switching between low and full power mode
+  (hold down the four rightmost Automap buttons while plugging in the Launchpad, and press one
+  of the red grid buttons to toggle)
+* *low* — defined by the brightness level, defaults to 1/5
+* *medium* — twice as bright as low brightness
+
+Launchpad uses fractions for setting the brightness (see `pad.multiplexing()` if you need this
+low-level access); this function is a simplified version and takes `brightness` as number
+between 0 and 1.
+
+Example for a fade effect:
+
+```js
+// First, set all LEDs to low brightness
+pad.reset( 1 );
+
+// Fade from dark to bright ...
+(new Array( 100 )).fill( 0 ).forEach(
+    // Set a bunch of timeouts which will change brightness
+    ( empty, ix ) => setTimeout(
+        () => pad.brightness( ix / 99 ), // ix ranges from 0 to 99
+        ix * 20 // set new brightness every 20 ms
+    )
+);
+```
 
 #### pad.multiplexing( num, den )
 
-Set the low/medium button brightness. Low brightness buttons are about `num/den` times as bright 
+Set the low/medium button brightness. Low brightness buttons are about `num/den` times as bright
 as full brightness buttons. Medium brightness buttons are twice as bright as low brightness.
 
 `num` must be between 1 and 16, `den` between 3 and 18.
@@ -148,24 +196,44 @@ Default is `1/5` when `num` and `den` are not given.
 
     pad.multiplexing( 2, 4 );
 
+---
+
 #### pad.fromMap( map )
 
 Generates a coordinate array from a string map, like the template for the picture on top:
 
-    pad.col( Launchpad.GreenFull, pad.fromMap(
-            '-x----x-o' +
-            'x-x--xxxo' +
-            'x-x--xxxo' +
-            '--------o' +
-            '--------o' +
-            '-x----x-o' +
-            '--xxxx--o' +
-            '---------' +
-            'oooxxooo '
-        ) );
+```js
+pad.col( Launchpad.GreenFull, pad.fromMap(
+        '-x----x-o' +
+        'x-x--xxxo' +
+        'x-x--xxxo' +
+        '--------o' +
+        '--------o' +
+        '-x----x-o' +
+        '--xxxx--o' +
+        '--------o' +
+        'oooxxooo '
+    ) );
+```
 
 The string map is **9×9 characters** long without line breaks. The 9th character per row
 is the scene button on the right. The last row consists of the 8 buttons on top.
 
 All buttons with a lowercase `x` will be returned, all others
 will not. The map can be shorter, e.g. `-xx` would produce `[ [1,0], [2,0] ]`.
+
+Copy/paste template (replace the desired buttons by an `x`):
+
+```js
+pad.fromMap(
+    '--------o' +
+    '--------o' +
+    '--------o' +
+    '--------o' +
+    '--------o' +
+    '--------o' +
+    '--------o' +
+    '--------o' +
+    'oooooooo '
+)
+```

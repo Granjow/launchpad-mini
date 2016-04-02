@@ -62,7 +62,7 @@ pad.connect().then( ( msg ) => {
     }
 
     // Reset pad
-    pad.reset(  );
+    pad.reset( 1 );
     pad.col( Launchpad.GreenFull, pad.fromMap(
         '-x----x-o' +
         'x-x--xxxo' +
@@ -74,14 +74,18 @@ pad.connect().then( ( msg ) => {
         '---------' +
         'oooxxooo '
     ) );
-    pad.multiplexing(1,10);
+
+    (new Array( 101 )).fill( 0 ).forEach( ( empty, ix ) => setTimeout( () => pad.brightness( ix / 100 ), ix * 20 ) );
 
     // Esc button
     pad.col( Launchpad.RedFull, [ 0, 8 ] );
+    pad.col( Launchpad.GreenLow, [ 1, 8 ] );
     pad.on( 'key', pair => {
         if ( pair.x === 0 && pair.y === 8 && pair.pressed ) {
             pad.reset( 1 );
             pad.disconnect();
+        } else if ( pair.x === 1 && pair.y === 8 && pair.pressed ) {
+            pad.multiplexing();
         }
     } );
 

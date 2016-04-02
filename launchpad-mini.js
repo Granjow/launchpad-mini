@@ -3,7 +3,8 @@
 const
     util = require( 'util' ),
     EventEmitter = require( 'events' ),
-    midi = require( 'midi' );
+    midi = require( 'midi' ),
+    brightnessSteps = require( './launchpad-mini-brightness' );
 
 const
     /**
@@ -176,14 +177,24 @@ Launchpad.prototype = {
     },
 
     /**
+     * Set the button brightness for buttons with non-full brightness.
+     * Lower brightness increases contrast since the full-brightness buttons will not change.
+     *
+     * @param {Number} brightness Brightness between 0 (dark) and 1 (bright)
+     */
+    brightness: function ( brightness ) {
+        this.multiplexing.apply( this, brightnessSteps.getNumDen( brightness ) );
+    },
+
+    /**
      * Generate an array of coordinate pairs from a string “painting”. The input string is 9×9 characters big
-     * and starts with the first button row (including the scene buttons on the right). The last row is for the 
+     * and starts with the first button row (including the scene buttons on the right). The last row is for the
      * Automap buttons which are in reality on top on the Launchpad.
-     * 
+     *
      * Any character which is a lowercase 'x' will be returned in the coordinate array.
      *
      * The generated array can be used for setting button colours, for example.
-     * 
+     *
      * @param {String} map
      * @returns {Array.<Array.<Number>>} Array containing [x,y] coordinate pairs.
      */
