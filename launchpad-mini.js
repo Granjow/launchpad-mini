@@ -141,17 +141,21 @@ Launchpad.prototype = {
      * Set the specified color for the given LED(s).
      * @param {Number} color
      * @param {Array.<Number>|Array.<Array.<Number>>} buttons [x,y] value pair, or array of pairs
+     * @return {Promise} Resolves as soon as the Launchpad has processed all data.
      */
     col: function ( color, buttons ) {
         // Code would look much better with the Rest operator ...
 
         if ( buttons.length > 0 && buttons[ 0 ] instanceof Array ) {
             buttons.forEach( btn => this.col( color, btn ) );
+            return new Promise( ( res, rej ) => setTimeout( res, buttons.length / 20 ) );
+
         } else {
             var b = this._button( buttons[ 0 ], buttons[ 1 ] );
             if ( b ) {
                 this.sendRaw( [ b.cmd, b.key, color ] );
             }
+            return new Promise( ( res, rej ) => res() );
         }
     },
 
@@ -257,7 +261,7 @@ util.inherits( Launchpad, EventEmitter );
  */
 Launchpad.color = ( r, g, mode ) => 16 * g + r + 12 * (!mode) + 8 * (mode === 'flash');
 
-/// List of default colors.
+// List of default colors.
 
 Launchpad.Off = Launchpad.color( 0, 0 );
 Launchpad.RedLow = Launchpad.color( 1, 0 );
@@ -270,5 +274,12 @@ Launchpad.AmberLow = Launchpad.color( 1, 1 );
 Launchpad.AmberMedium = Launchpad.color( 2, 2 );
 Launchpad.AmberFull = Launchpad.color( 3, 3 );
 Launchpad.YellowFull = Launchpad.color( 1, 3 );
+
+// Button Groups
+
+Launchpad.Buttons = {
+    All: (new Array( 80 )).fill( 0 ).map( ( empty, ix ) => [ ix % 9, (ix - ix % 9) / 9 ] ),
+    Grid: (new Array( 64 )).fill( 0 ).map( ( empty, ix ) => [ ix % 8, (ix - ix % 8) / 8 ] )
+};
 
 module.exports = Launchpad;

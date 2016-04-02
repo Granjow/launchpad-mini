@@ -75,17 +75,55 @@ pad.connect().then( ( msg ) => {
         'oooxxooo '
     ) );
 
-    (new Array( 101 )).fill( 0 ).forEach( ( empty, ix ) => setTimeout( () => pad.brightness( ix / 100 ), ix * 20 ) );
 
     // Esc button
     pad.col( Launchpad.RedFull, [ 0, 8 ] );
     pad.col( Launchpad.GreenLow, [ 1, 8 ] );
+    pad.col( Launchpad.GreenLow, [ 2, 8 ] );
+    pad.col( Launchpad.Off, [ 3, 8 ] );
+    pad.col( Launchpad.GreenLow, [ 4, 8 ] );
+    pad.col( Launchpad.GreenLow, [ 5, 8 ] );
+    pad.col( Launchpad.Off, [ 6, 8 ] );
+    pad.col( Launchpad.Off, [ 7, 8 ] );
     pad.on( 'key', pair => {
-        if ( pair.x === 0 && pair.y === 8 && pair.pressed ) {
-            pad.reset( 1 );
-            pad.disconnect();
-        } else if ( pair.x === 1 && pair.y === 8 && pair.pressed ) {
-            pad.multiplexing();
+        if ( pair.pressed && pair.y === 8 ) {
+            if ( pair.x === 0 ) {
+                // Exit
+                pad.reset( 1 );
+                pad.disconnect();
+            } else if ( pair.x === 1 ) {
+                // Reset brightness
+                pad.multiplexing();
+            } else if ( pair.x === 2 ) {
+                // Fade
+                (new Array( 101 )).fill( 0 ).forEach( ( empty, ix ) => setTimeout( () => pad.brightness( ix / 100 ), ix * 20 ) );
+            } else if ( pair.x === 4 ) {
+                // Does not update correctly for 6 or more repetitions
+                let btns = Launchpad.Buttons.Grid;
+                for ( let i = 0; i < 8; i++ ) {
+                    pad.col( Launchpad.RedLow, btns );
+                    pad.col( Launchpad.RedFull, btns );
+                    pad.col( Launchpad.AmberLow, btns );
+                    pad.col( Launchpad.AmberFull, btns );
+                    pad.col( Launchpad.GreenLow, btns );
+                    pad.col( Launchpad.GreenFull, btns );
+                }
+            } else if ( pair.x === 5 ) {
+                // Does not update correctly for 6 or more repetitions
+                let btns = Launchpad.Buttons.Grid,
+                    loop = ( n ) => {
+                        pad.col( Launchpad.RedLow, btns )
+                            .then( () => pad.col( Launchpad.RedFull, btns ) )
+                            .then( () => pad.col( Launchpad.AmberLow, btns ) )
+                            .then( () => pad.col( Launchpad.AmberMedium, btns ) )
+                            .then( () => pad.col( Launchpad.GreenLow, btns ) )
+                            .then( () => pad.col( Launchpad.GreenMedium, btns ) )
+                            .then( () => n > 0 ? loop( n - 1 ) : null )
+                            .catch( ( err ) => console.error( 'Oh no: ', err ) );
+                    };
+
+                loop( 32 );
+            }
         }
     } );
 

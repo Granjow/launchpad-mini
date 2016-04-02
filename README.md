@@ -62,6 +62,7 @@ In code, the Automap buttons have column number 8 (not 0).
 **Colors:** 
 
 Launchpad buttons are lit by a red and a green LED each; combined, they give Amber.
+Each LED supports 3 power levels: off, low, medium, and full.
 
     Launchpad.Off
     Launchpad.RedLow
@@ -74,6 +75,8 @@ Launchpad buttons are lit by a red and a green LED each; combined, they give Amb
     Launchpad.AmberMedium
     Launchpad.AmberFull
     Launchpad.YellowFull
+
+---
 
 ### Events
 
@@ -103,6 +106,29 @@ pad.on( 'key', k => {
     console.log( `Key ${k.x},${k.y} down: ${k.pressed}`);
 } );
 ```
+
+---
+
+### Launchpad object
+
+#### new Launchpad()
+
+Constructor function.
+
+```js
+let pad = new Launchpad();
+```
+
+#### Launchpad.Buttons
+
+Contains predefined button coordinates:
+
+```js
+Launchpad.Buttons.All  // All buttons
+Launchpad.Buttons.Grid // 8x8 Grid buttons
+```
+
+---
 
 ### Methods
 
@@ -135,12 +161,51 @@ to the defined brightness between `1` (low) and `3` (high), other values switch 
 
     pad.reset(); // Turn off all LEDs
 
-#### pad.col( color, buttons )
+#### pad.col( color, buttons ): Promise
 
 Sets the color for the given buttons. The `buttons` parameter is either a value pair `[0,0]` to `[8,8]` specifying 
 a single button, or an array of such pairs. Example:
 
     pad.col( Launchpad.GreenFull, [ [0,0], [1,1], [2,2] ] );
+
+This function returns an ES6 promise. It is possible to send data much faster than it
+can be processed by Launchpad (according to their docs it is because they use a low-speed
+USB version which supports at most 400 messages per second). Then, data gets lost and
+the button colours are not correct anymore. To avoid this problem, wait until the data
+has been sent before sending more data.
+
+For example, the following code will fail, and at the end the butons have random colors
+instead of full green:
+
+```js
+let btns = Launchpad.Buttons.All;
+for ( let i = 0; i < 10; i++ ) {
+    pad.col( Launchpad.RedLow, btns );
+    pad.col( Launchpad.RedFull, btns );
+    pad.col( Launchpad.AmberLow, btns );
+    pad.col( Launchpad.AmberFull, btns );
+    pad.col( Launchpad.GreenLow, btns );
+    pad.col( Launchpad.GreenFull, btns );
+}
+```
+
+Instead, use promises like so:
+
+```js
+let btns = Launchpad.Buttons.All,
+    loop = ( n ) => {
+        pad.col( Launchpad.RedLow, btns )
+            .then( () => pad.col( Launchpad.RedFull, btns ) )
+            .then( () => pad.col( Launchpad.AmberLow, btns ) )
+            .then( () => pad.col( Launchpad.AmberFull, btns ) )
+            .then( () => pad.col( Launchpad.GreenLow, btns ) )
+            .then( () => pad.col( Launchpad.GreenFull, btns ) )
+            .then( () => n > 0 ? loop( n - 1 ) : null )
+            .catch( ( err ) => console.error( 'Oh no: ', err ) );
+    };
+
+loop( 32 );
+```
 
 ---
 
@@ -218,6 +283,8 @@ pad.col( Launchpad.GreenFull, pad.fromMap(
 
 The string map is **9×9 characters** long without line breaks. The 9th character per row
 is the scene button on the right. The last row consists of the 8 buttons on top.
+
+(Yes; there are in fact 80 and not 81 buttons.)
 
 All buttons with a lowercase `x` will be returned, all others
 will not. The map can be shorter, e.g. `-xx` would produce `[ [1,0], [2,0] ]`.
