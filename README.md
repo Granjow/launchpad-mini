@@ -51,19 +51,21 @@ The documentation below is mainly an overview and not equally precise.
      7  [][][][][][][][] o
     (y)
 
-**Colors:** (Launchpad buttons are lit by a red and a green LED each; combined, they give Amber.)
+**Colors:** 
 
-* `Launchpad.Off`
-* `Launchpad.RedLow`
-* `Launchpad.RedMedium`
-* `Launchpad.RedFull`
-* `Launchpad.GreenLow`
-* `Launchpad.GreenMedium`
-* `Launchpad.GreenFull`
-* `Launchpad.AmberLow`
-* `Launchpad.AmberMedium`
-* `Launchpad.AmberFull`
-* `Launchpad.YellowFull`
+Launchpad buttons are lit by a red and a green LED each; combined, they give Amber.
+
+    Launchpad.Off
+    Launchpad.RedLow
+    Launchpad.RedMedium
+    Launchpad.RedFull
+    Launchpad.GreenLow
+    Launchpad.GreenMedium
+    Launchpad.GreenFull
+    Launchpad.AmberLow
+    Launchpad.AmberMedium
+    Launchpad.AmberFull
+    Launchpad.YellowFull
 
 ### Events
 
@@ -72,60 +74,81 @@ Subscribe with e.g.
 
     pad.on( 'connect', () => console.log( 'Launchpad connected!' ) ); 
 
-#### `'connect': ()`
+#### connect
 
 Emitted when connection to a Launchpad has been established.
 
-#### `'disconnect': ()`
+#### disconnect
 
 Emitted when the ports have been closed, usually after calling `pad.disconnect()`.
 
-#### `'key': (x:Number, y:Number, pressed:Boolean)`
+#### key
 
-Emitted when a key is pressed or released. Example usage:
+Emitted when a key is pressed or released. An object of the following format is passed:
 
-    pad.on( 'key', k => console.log( `Key ${k.x},${k.y} down: ${k.pressed}`) );
+    { x: 1, y: 3, pressed: true }
+
+Example usage:
+
+    pad.on( 'key', k => {
+        console.log( `Key ${k.x},${k.y} down: ${k.pressed}`);
+    } );
 
 ### Methods
 
-#### `pad.connect( port:Number ): Promise`
+#### pad.connect( port )
 
-Connects to the launchpad. The port can optionally be specified; if not given, the first Launchpad that is found
-is taken.
+Connects to the launchpad. The MIDI `port` can optionally be specified; if not given, the first Launchpad that is found
+is taken. Returns an ES6 Promise.
 
-#### `pad.disconnect()`
+```js
+pad.connect().then( () => {
+    // Connected; do something!
+}, msg => { console.log('Could not connect: ', msg); } )
+```
+
+#### pad.disconnect()
 
 Disconnect.
 
-#### `pad.availablePorts`
+#### pad.availablePorts
 
 A getter which returns available MIDI ports where a Launchpad is connected (other MIDI devices are not returned).
 Probably useful if you have more than one Launchpad connected.
 
-#### `pad.reset( brightness:Number )`
+#### pad.reset( brightness )
 
 Resets the pad's mapping mode, buffer settings, and duty cycle. The optional `brightness` parameter sets all LEDs 
 to the defined brightness between `1` (low) and `3` (high), other values switch the LEDs off.
 
-#### `pad.col( color:Number, buttons:Array )`
+    pad.reset(); // Turn off all LEDs
+
+#### pad.col( color, buttons )
 
 Sets the color for the given buttons. The `buttons` parameter is either a value pair `[0,0]` to `[8,8]` specifying 
 a single button, or an array of such pairs. Example:
 
     pad.col( Launchpad.GreenFull, [ [0,0], [1,1], [2,2] ] );
 
-#### `pad.pressedButtons`
+#### pad.pressedButtons
 
 A getter, which returns an array of `[x,y]` pairs of buttons which are currently pressed.
 
-#### `pad.multiplexing( num:Number, den:Number )`
+    pad.pressedButtons
+    // -> [ [0,0], [2,7] ]
+
+#### pad.multiplexing( num, den )
 
 Set the low/medium button brightness. Low brightness buttons are about `num/den` times as bright 
 as full brightness buttons. Medium brightness buttons are twice as bright as low brightness.
 
+`num` must be between 1 and 16, `den` between 3 and 18.
+
 Default is `1/5` when `num` and `den` are not given.
 
-#### `pad.fromMap( map:String ): Array`
+    pad.multiplexing( 2, 4 );
+
+#### pad.fromMap( map )
 
 Generates a coordinate array from a string map, like the template for the picture on top:
 
@@ -141,5 +164,8 @@ Generates a coordinate array from a string map, like the template for the pictur
             'oooxxooo '
         ) );
 
-The string map is **9×9 characters** long without line breaks. All buttons with an `x` will be returned, all others
+The string map is **9×9 characters** long without line breaks. The 9th character per row
+is the scene button on the right. The last row consists of the 8 buttons on top.
+
+All buttons with a lowercase `x` will be returned, all others
 will not. The map can be shorter, e.g. `-xx` would produce `[ [1,0], [2,0] ]`.
