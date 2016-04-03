@@ -79,6 +79,26 @@ Each LED supports 3 power levels: off, low, medium, and full.
     Launchpad.AmberFull
     Launchpad.YellowFull
 
+**Buffers:**
+
+The Launchpad has two buffers `0` and `1` which contain two separate LED states. For example,
+in one buffer, all LEDs can be red, and in the other buffer, all LEDs can be green.
+
+By default, buffer `0` is used for displaying and for writing. The assignment can be chosen
+freely, for example:
+
+
+    Buffer 0            Buffer 1
+
+    r r r r r r r r     g g g g g g g g
+    r r r r r r ...     g g g g g g ...
+    ...
+              ↑              ↑
+              └── display    │
+                  write to ──┘
+
+By alternating the displayed buffer, buttons can be made blinking.
+
 ---
 
 ### Events

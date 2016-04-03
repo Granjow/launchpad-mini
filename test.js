@@ -19,65 +19,32 @@ pad.connect().then( ( msg ) => {
     // MIDI device inquiry
     // pad.sendRaw( [ 0xf0, 0x7e, 0x7f, 0x06, 0x01, 0xf7 ] );
 
-    // ON all LEDs
-    pad.sendRaw( [ 0xb0, 0x00, 0x7f ] );
-    // OFF all LEDs
-    pad.sendRaw( [ 0xb0, 0x00, 0x00 ] );
-
-    pad.sendRaw( [ 0x90, 0, 11 ] );
-    pad.sendRaw( [ 0x90, 1, 3 ] );
-    pad.sendRaw( [ 0x90, 2, 32 ] );
-    pad.sendRaw( [ 0x90, 3, 35 ] );
-
-    pad.sendRaw( [ 0x90, 16, Launchpad.AmberLow ] );
-    pad.sendRaw( [ 0x90, 17, Launchpad.AmberMedium ] );
-    pad.sendRaw( [ 0x90, 18, Launchpad.AmberFull ] );
-    pad.sendRaw( [ 0x90, 19, Launchpad.YellowFull ] );
-
     // Top row: Automap/Live buttons set with 0x0b (Scene Launch buttons on the right are just row 8)
     pad.sendRaw( [ 0xb0, 111, 32 ] );
     // pad.sendRaw( [ 0x90, 104+4, 32 ] );
     // pad.sendRaw( [ 0x90, 104+8, 32 ] );
 
     if ( false ) {
-        pad.at( 4, 4 ).col( Launchpad.GreenFull );
-        pad.ats( [ 5, 5 ], [ 6, 6 ], [ 7, 7 ] ).forEach( button => button.col( Launchpad.RedFull ) );
-
-        // Want to easily select buttons
-        pad.fromMap(
-            '------xx-' +
-            '-----xx--' +
-            '----xx---' +
-            '---xx----'
-        ).forEach( button => button.col( Launchpad.AmberLow ) );
-
-        // Want to use double buffering for setting many button colours at once
-        // Want to efficiently update multiple buttons with rapid fire
-        pad.col( Launchpad.YellowFull, [ [ 0, 4 ], [ 1, 5 ], [ 2, 6 ], [ 3, 7 ] ] );
-
-        pad.col( Launchpad.GreenFull, pad.fromMap(
-            'xxx--xxx '
-        ) );
-
-        // Want to directly use the key for setting the colour
-        pad.on( 'key', key => pad.col( Launchpad.GreenFull, key ) );
-
+        pad.col( 16, '4:xxx...xx' );
+        pad.col( 3,
+            'a:x..x' +
+            's:..xx'
+        );
     }
 
     // Reset pad
-    pad.reset( 1 );
-    pad.col( Launchpad.GreenFull, pad.fromMap(
-        '-x----x-o' +
-        'x-x--xxxo' +
-        'x-x--xxxo' +
-        '--------o' +
-        '--------o' +
-        '-x----x-o' +
-        '--xxxx--o' +
-        '---------' +
-        'oooxxooo '
-    ) );
+    pad.reset( 2 );
 
+    pad.col( 16 + 12, [ [ 0, 0 ], [ 1, 0 ], [ 2, 0 ] ] );
+
+    pad.col( 3, [ 0, 0 ] );
+    pad.col( 3 + 4, [ 1, 0 ] ); // copy
+    pad.col( 3 + 8, [ 2, 0 ] ); // clear
+
+    pad.writeBuffer = 1;
+    pad.col( 3, [ [ 4, 0 ], [ 5, 0 ] ] );
+    pad.writeBuffer = 0;
+    pad.col( 3, [ [ 6, 0 ], [ 7, 0 ] ] );
 
     // Esc button
     pad.col( Launchpad.RedFull, [ 0, 8 ] );
@@ -100,6 +67,8 @@ pad.connect().then( ( msg ) => {
                 pad.sendRaw( [ 0xb0, 0x00, 0x20 ] );
             } else if ( pair.y === 1 ) {
                 pad.sendRaw( [ 0xb0, 0x00, 0x21 ] );
+            } else if ( pair.y === 4 ) {
+                pad.sendRaw( [ 0xb0, 0x0, 0b110101 ] );
             }
         }
         if ( pair.pressed && pair.y === 8 ) {

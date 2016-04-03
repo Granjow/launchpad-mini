@@ -21,6 +21,9 @@ const
             port.openPort( desc.portNumber );
             return true;
         } );
+    },
+    or = function ( test, alternative ) {
+        return test === undefined ? !!alternative : !!test;
     };
 
 const Launchpad = function () {
@@ -43,6 +46,15 @@ const Launchpad = function () {
             b.key = b.y >= 8 ? 0x68 + b.x : 0x10 * b.y + b.x;
             return b;
         } );
+
+    /** @type {Number} */
+    this._writeBuffer = 0;
+
+    /** @type {Number} */
+    this._displayBuffer = 0;
+
+    /** @type {Boolean} */
+    this._flashing = false;
 
     return this;
 };
@@ -132,6 +144,7 @@ Launchpad.prototype = {
      * @param {Number} x
      * @param {Number} y
      * @returns {boolean}
+     * @todo Use array instead
      */
     isPressed: function ( x, y ) {
         return this._buttons.some( b => b.pressed && b.x === x && b.y === y );
@@ -157,6 +170,64 @@ Launchpad.prototype = {
             }
             return new Promise( ( res, rej ) => res() );
         }
+    },
+
+    /**
+     * @return {Number} Current buffer (0 or 1) that is written to
+     */
+    get writeBuffer() {
+        return this._writeBuffer;
+    },
+
+    /**
+     * @return {Number} Current buffer (0 or 1) that is displayed
+     */
+    get displayBuffer() {
+        return this._displayBuffer;
+    },
+
+    /**
+     * Select the buffer to which LED colors are written. Default buffer of an unconfigured Launchpad is 0.
+     * @param {Number} bufferNumber
+     */
+    set writeBuffer( bufferNumber ) {
+        this.setBuffers( { write: bufferNumber } );
+    },
+
+    /**
+     * Select which buffer the Launchpad uses for the LED button colors. Default is 0.
+     * @param {Number} bufferNumber
+     */
+    set displayBuffer( bufferNumber ) {
+        this.setBuffers( { display: bufferNumber } );
+    },
+
+    /**
+     * Enable flashing. This essentially tells Launchpad to alternate the display buffer
+     * at a pre-defined speed.
+     * @param {Boolean} flash
+     */
+    set flash( flash ) {
+        this.setBuffers( { flash: flash } );
+    },
+
+    /**
+     * @param {{write:Number=, display:Number=, copyToDisplay:Boolean=, flash:Boolean=}=} args
+     */
+    setBuffers: function ( args ) {
+        args = args || {};
+        this._flashing = or( args.flash, this._flashing );
+        this._writeBuffer = 1 * or( args.write, this._writeBuffer );
+        this._displayBuffer = 1 * or( args.display, this._displayBuffer );
+
+        let cmd =
+            0b100000 +
+            0b010000 * or( args.copyToDisplay, 0 ) +
+            0b001000 * this._flashing +
+            0b000100 * this.writeBuffer +
+            0b000001 * this.displayBuffer;
+
+        this.sendRaw( [ 0xb0, 0x00, cmd ] );
     },
 
     /**
