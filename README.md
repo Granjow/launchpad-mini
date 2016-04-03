@@ -19,10 +19,17 @@ Some of the bonus features of this library:
 
 ## Usage
 
-    const Launchpad = require( 'launchpad-mini' ),
-          pad = new Launchpad();
-    pad.connect()                       // Auto-detect Launchpad
-        .then( () => pad.reset( 2 ) );  // Make Launchpad glow yellow
+```js
+const Launchpad = require( 'launchpad-mini' ),
+      pad = new Launchpad();
+pad.connect()                       // Auto-detect Launchpad
+    .then( () => {
+        pad.reset( 2 );             // Make Launchpad glow yellow
+        pad.on( 'key', k => {
+            pad.col( pad.red, k );   // Turn on buttons on press
+        } );
+    } );
+```
 
 ## Documentation
 
@@ -37,8 +44,15 @@ written by Novation, but for some reason it is not available on their web site.
 
 ## API
 
-All methods are documented in the code, so your IDE should provide you with documentation and type annotation.
-The documentation below is mainly an overview and not equally precise.
+All methods are also documented in the code, so your IDE should provide you with
+documentation and type annotation.
+
+**Overview:**
+
+* [Events](#Events) `connect` `disconnect` `key`
+* [Launchpad object](#Launchpad object)
+* [Methods](#Methods)
+
 
 **Buttons:**
 
@@ -65,19 +79,39 @@ In code, the Automap buttons have column number 8 (not 0).
 **Colors:** 
 
 Launchpad buttons are lit by a red and a green LED each; combined, they give Amber.
-Each LED supports 3 power levels: off, low, medium, and full.
 
-    Launchpad.Off
-    Launchpad.RedLow
-    Launchpad.RedMedium
-    Launchpad.RedFull
-    Launchpad.GreenLow
-    Launchpad.GreenMedium
-    Launchpad.GreenFull
-    Launchpad.AmberLow
-    Launchpad.AmberMedium
-    Launchpad.AmberFull
-    Launchpad.YellowFull
+Yellow also kind of exists, but the colour difference is marginal and only visible
+on full power level, therefore others are not provided.
+```js
+pad.red
+pad.green
+pad.amber
+pad.off
+pad.yellow
+```
+
+Each LED supports 3 power levels: off, low, medium, and (default) full.
+```js
+pad.red.off
+pad.red.low
+pad.red.medium
+pad.red.full
+```
+
+Additionally, the color for the other buffer than the active write buffer (see below)
+can be set simultaneously to either off or to the same color.
+
+```js
+pad.red         // write buffer: red, other buffer: unmodified
+pad.red.copy    // write buffer: red, other buffer: red
+pad.red.clear   // write buffer: red, other buffer: off
+```
+
+Properties can be chained:
+
+```js
+pad.green.medium.copy   // medium green on both buffers
+```
 
 **Buffers:**
 
@@ -118,10 +152,12 @@ Emitted when the ports have been closed, usually after calling `pad.disconnect()
 
 #### key
 
-Emitted when a key is pressed or released. The callback receives an object of
+Emitted when a key is pressed or released. The callback receives a `k` object of
 the following format:
 
-    { x: 1, y: 3, pressed: true }
+```js
+k = { x: 1, y: 3, pressed: true }
+```
 
 Example usage:
 
@@ -133,7 +169,9 @@ pad.on( 'key', k => {
 
 Actually, there are a few more properties defined on the object:
 
-    { x: 1, y: 3, pressed: true, 0: 1, 1: 3, length: 2 }
+```js
+k = { x: 1, y: 3, pressed: true, 0: 1, 1: 3, length: 2 }
+```
 
 The keys `0` and `1` allow to use the object like an array, and it can be passed
 to e.g. `.col` directly. Example for highlighting the pressed button:
@@ -142,10 +180,10 @@ to e.g. `.col` directly. Example for highlighting the pressed button:
 pad.on( 'key', pair => {
     if ( pair.pressed ) {
         // Red when button is pressed
-        pad.col( Launchpad.RedFull, pair );
+        pad.col( pad.red, pair );
     } else {
         // Off when button is released
-        pad.col( Launchpad.Off, pair );
+        pad.col( pad.off, pair );
     }
 } );
 ```
@@ -223,12 +261,12 @@ instead of full green:
 ```js
 let btns = Launchpad.Buttons.All;
 for ( let i = 0; i < 10; i++ ) {
-    pad.col( Launchpad.RedLow, btns );
-    pad.col( Launchpad.RedFull, btns );
-    pad.col( Launchpad.AmberLow, btns );
-    pad.col( Launchpad.AmberFull, btns );
-    pad.col( Launchpad.GreenLow, btns );
-    pad.col( Launchpad.GreenFull, btns );
+    pad.col( pad.red.low, btns );
+    pad.col( pad.red.full, btns );
+    pad.col( pad.amber.low, btns );
+    pad.col( pad.amber.full, btns );
+    pad.col( pad.green.low, btns );
+    pad.col( pad.green.full, btns );
 }
 ```
 
@@ -237,12 +275,12 @@ Instead, use promises like so:
 ```js
 let btns = Launchpad.Buttons.All,
     loop = ( n ) => {
-        pad.col( Launchpad.RedLow, btns )
-            .then( () => pad.col( Launchpad.RedFull, btns ) )
-            .then( () => pad.col( Launchpad.AmberLow, btns ) )
-            .then( () => pad.col( Launchpad.AmberFull, btns ) )
-            .then( () => pad.col( Launchpad.GreenLow, btns ) )
-            .then( () => pad.col( Launchpad.GreenFull, btns ) )
+        pad.col( pad.red.low, btns )
+            .then( () => pad.col( pad.red.full, btns ) )
+            .then( () => pad.col( pad.amber.low, btns ) )
+            .then( () => pad.col( pad.amber.full, btns ) )
+            .then( () => pad.col( pad.green.low, btns ) )
+            .then( () => pad.col( pad.green.full, btns ) )
             .then( () => n > 0 ? loop( n - 1 ) : null )
             .catch( ( err ) => console.error( 'Oh no: ', err ) );
     };
@@ -287,7 +325,7 @@ pad.writeBuffer;
 pad.writeBuffer = 1;
 ```
 
-#### setBuffers( args )
+#### pad.setBuffers( args )
 
 Alternative interface for changing all buffer settings at once. The `args` parameter
 looks as follows:
@@ -375,7 +413,7 @@ Default is `1/5` when `num` and `den` are not given.
 Generates a coordinate array from a string map, like the template for the picture on top:
 
 ```js
-pad.col( Launchpad.GreenFull, pad.fromMap(
+pad.col( pad.green, pad.fromMap(
         '-x----x-o' +
         'x-x--xxxo' +
         'x-x--xxxo' +

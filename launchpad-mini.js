@@ -4,7 +4,8 @@ const
     util = require( 'util' ),
     EventEmitter = require( 'events' ),
     midi = require( 'midi' ),
-    brightnessSteps = require( './launchpad-mini-brightness' );
+    brightnessSteps = require( './launchpad-mini-brightness' ),
+    colors = require( './launchpad-mini-colors' );
 
 const
     /**
@@ -150,7 +151,7 @@ Launchpad.prototype = {
 
     /**
      * Set the specified color for the given LED(s).
-     * @param {Number} color
+     * @param {Number|Color} color A color code, or one of the pre-defined colors.
      * @param {Array.<Number>|Array.<Array.<Number>>} buttons [x,y] value pair, or array of pairs
      * @return {Promise} Resolves as soon as the Launchpad has processed all data.
      */
@@ -162,11 +163,11 @@ Launchpad.prototype = {
             return new Promise( ( res, rej ) => setTimeout( res, buttons.length / 20 ) );
 
         } else {
-            var b = this._button( buttons[ 0 ], buttons[ 1 ] );
+            var b = this._button( buttons );
             if ( b ) {
-                this.sendRaw( [ b.cmd, b.key, color ] );
+                this.sendRaw( [ b.cmd, b.key, color.code || color ] );
             }
-            return new Promise( ( res, rej ) => res() );
+            return new Promise( ( res, rej ) => res( !!b ) );
         }
     },
 
@@ -282,11 +283,26 @@ Launchpad.prototype = {
             .map( data => [ data.x, data.y ] );
     },
 
+    /** @type {Color} */
+    red: colors.red,
+    /** @type {Color} */
+    green: colors.green,
+    /** @type {Color} */
+    amber: colors.amber,
+    /**
+     * Due to limitations in LED levels, only full brightness is available for yellow,
+     * the other modifier versions have no effect.
+     * @type {Color} 
+     */
+    yellow: colors.yellow,
+    /** @type {Color} */
+    off: colors.off,
+
     /**
      * @returns {{pressed: Boolean, x: Number, y: Number, cmd:Number, key:Number}} Button at given coordinates
      */
-    _button: function ( x, y ) {
-        return this._buttons[ 9 * y + x ];
+    _button: function ( pair ) {
+        return this._buttons[ 9 * pair[ 1 ] + pair[ 0 ] ];
     },
 
     _processMessage: function ( deltaTime, message ) {
@@ -300,7 +316,7 @@ Launchpad.prototype = {
 
             console.log( message[ 1 ], x, y );
 
-            this._button( x, y ).pressed = pressed;
+            this._button( [ x, y ] ).pressed = pressed;
             this.emit( 'key', {
                 x: x, y: y, pressed: pressed,
                 // Pretend to be an array so the returned object
@@ -315,7 +331,7 @@ Launchpad.prototype = {
                 y = 8,
                 pressed = message[ 2 ] > 0;
 
-            this._button( x, y ).pressed = pressed;
+            this._button( [ x, y ] ).pressed = pressed;
             this.emit( 'key', { x: x, y: y, pressed: pressed } );
 
         } else {
@@ -325,30 +341,6 @@ Launchpad.prototype = {
 
 };
 util.inherits( Launchpad, EventEmitter );
-
-
-/**
- * Generates a color by setting red and green LED power individually.
- * @param {Number} r Red brightness, 0 (off) to 3 (max)
- * @param {Number} g Green brightness, 0 (off) to 3 (max)
- * @param {String=} mode Can be 'flash' for flashing LED or 'double' for double-buffering. Leave undefined for default mode.
- * @return {Number}
- */
-Launchpad.color = ( r, g, mode ) => 16 * g + r + 12 * (!mode) + 8 * (mode === 'flash');
-
-// List of default colors.
-
-Launchpad.Off = Launchpad.color( 0, 0 );
-Launchpad.RedLow = Launchpad.color( 1, 0 );
-Launchpad.RedMedium = Launchpad.color( 2, 0 );
-Launchpad.RedFull = Launchpad.color( 3, 0 );
-Launchpad.GreenLow = Launchpad.color( 0, 1 );
-Launchpad.GreenMedium = Launchpad.color( 0, 2 );
-Launchpad.GreenFull = Launchpad.color( 0, 3 );
-Launchpad.AmberLow = Launchpad.color( 1, 1 );
-Launchpad.AmberMedium = Launchpad.color( 2, 2 );
-Launchpad.AmberFull = Launchpad.color( 3, 3 );
-Launchpad.YellowFull = Launchpad.color( 1, 3 );
 
 // Button Groups
 

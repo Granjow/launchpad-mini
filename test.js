@@ -28,18 +28,35 @@ pad.connect().then( ( msg ) => {
         pad.col( 16, '4:xxx...xx' );
         pad.col( 3,
             'A:x..x' +
-            'S:..xx'
+            'S:..xx' +
+            '2r:x  x x' // row
         );
+
+        Launchpad.Red( 'full', 'copy' );
+        Launchpad.Green( 'medium', 'clear' );
+        Launchpad.Amber( 'low' );
+        Launchpad.Off();
+
+        Launchpad.Red().full();
+        Launchpad.Green().clear();
+        Launchpad.Off().copy();
+
+        pad.Red().full();
+        pad.Green().clear();
+        pad.Off().copy();
+
+        pad.red.full;
+        pad.green.clear;
+        pad.off.copy;
     }
 
     // Reset pad
     pad.reset( 2 );
 
-    pad.col( 16 + 12, [ [ 0, 0 ], [ 1, 0 ], [ 2, 0 ] ] );
-
-    pad.col( 3, [ 0, 0 ] );
-    pad.col( 3 + 4, [ 1, 0 ] ); // copy
-    pad.col( 3 + 8, [ 2, 0 ] ); // clear
+    pad.col( pad.green.copy, [ [ 0, 0 ], [ 1, 0 ], [ 2, 0 ] ] );
+    pad.col( pad.red, [ 0, 0 ] );
+    pad.col( pad.red.copy, [ 1, 0 ] ); // copy
+    pad.col( pad.red.clear, [ 2, 0 ] ); // clear
 
     pad.writeBuffer = 1;
     pad.col( 3, [ [ 4, 0 ], [ 5, 0 ] ] );
@@ -47,27 +64,29 @@ pad.connect().then( ( msg ) => {
     pad.col( 3, [ [ 6, 0 ], [ 7, 0 ] ] );
 
     // Esc button
-    pad.col( Launchpad.RedFull, [ 0, 8 ] );
-    pad.col( Launchpad.GreenLow, [ 1, 8 ] );
-    pad.col( Launchpad.GreenLow, [ 2, 8 ] );
-    pad.col( Launchpad.Off, [ 3, 8 ] );
-    pad.col( Launchpad.GreenLow, [ 4, 8 ] );
-    pad.col( Launchpad.GreenLow, [ 5, 8 ] );
-    pad.col( Launchpad.Off, [ 6, 8 ] );
-    pad.col( Launchpad.Off, [ 7, 8 ] );
+    pad.col( pad.red.full, [ 0, 8 ] );
+    pad.col( pad.green.low, [ 1, 8 ] );
+    pad.col( pad.green.low, [ 2, 8 ] );
+    pad.col( pad.off, [ 3, 8 ] );
+    pad.col( pad.green.low, [ 4, 8 ] );
+    pad.col( pad.green.low, [ 5, 8 ] );
+    pad.col( pad.off, [ 6, 8 ] );
+    pad.col( pad.off, [ 7, 8 ] );
     pad.on( 'key', pair => {
         if ( pair.pressed ) {
-            pad.col( Launchpad.RedFull, pair );
-            pad.col( Launchpad.color( 1, 3, 'blink' ), pair );
+            pad.col( pad.red.full, pair );
+            pad.writeBuffer = 1;
+            pad.col( pad.red.low, pair );
+            pad.writeBuffer = 0;
         } else {
-            pad.col( Launchpad.Off, pair );
+            pad.col( pad.off, pair );
         }
         if ( pair.pressed && pair.x === 8 ) {
             if ( pair.y === 0 ) {
                 pad.displayBuffer = 0;
             } else if ( pair.y === 1 ) {
                 pad.displayBuffer = 1;
-            } else if (pair.y === 2) {
+            } else if ( pair.y === 2 ) {
                 pad.flash = true;
             } else if ( pair.y === 4 ) {
                 pad.sendRaw( [ 0xb0, 0x0, 0b110101 ] );
@@ -88,23 +107,23 @@ pad.connect().then( ( msg ) => {
                 // Does not update correctly for 6 or more repetitions
                 let btns = Launchpad.Buttons.Grid;
                 for ( let i = 0; i < 8; i++ ) {
-                    pad.col( Launchpad.RedLow, btns );
-                    pad.col( Launchpad.RedFull, btns );
-                    pad.col( Launchpad.AmberLow, btns );
-                    pad.col( Launchpad.AmberFull, btns );
-                    pad.col( Launchpad.GreenLow, btns );
-                    pad.col( Launchpad.GreenFull, btns );
+                    pad.col( pad.red.low, btns );
+                    pad.col( pad.red.full, btns );
+                    pad.col( pad.amber.low, btns );
+                    pad.col( pad.amber.full, btns );
+                    pad.col( pad.green.low, btns );
+                    pad.col( pad.green.full, btns );
                 }
             } else if ( pair.x === 5 ) {
                 // Does not update correctly for 6 or more repetitions
                 let btns = Launchpad.Buttons.Grid,
                     loop = ( n ) => {
-                        pad.col( Launchpad.RedLow, btns )
-                            .then( () => pad.col( Launchpad.RedFull, btns ) )
-                            .then( () => pad.col( Launchpad.AmberLow, btns ) )
-                            .then( () => pad.col( Launchpad.AmberMedium, btns ) )
-                            .then( () => pad.col( Launchpad.GreenLow, btns ) )
-                            .then( () => pad.col( Launchpad.GreenMedium, btns ) )
+                        pad.col( pad.red.low, btns )
+                            .then( () => pad.col( pad.red.full, btns ) )
+                            .then( () => pad.col( pad.amber.low, btns ) )
+                            .then( () => pad.col( pad.amber.medium, btns ) )
+                            .then( () => pad.col( pad.green.low, btns ) )
+                            .then( () => pad.col( pad.green.medium, btns ) )
                             .then( () => n > 0 ? loop( n - 1 ) : null )
                             .catch( ( err ) => console.error( 'Oh no: ', err ) );
                     };
