@@ -20,15 +20,16 @@ Some of the bonus features of this library:
 ## Usage
 
 ```js
+'use strict';
 const Launchpad = require( 'launchpad-mini' ),
       pad = new Launchpad();
-pad.connect()                       // Auto-detect Launchpad
-    .then( () => {
-        pad.reset( 2 );             // Make Launchpad glow yellow
-        pad.on( 'key', k => {
-            pad.col( pad.red, k );   // Turn on buttons on press
-        } );
+
+pad.connect().then( () => {     // Auto-detect Launchpad
+    pad.reset( 2 );             // Make Launchpad glow yellow
+    pad.on( 'key', k => {
+        pad.col( pad.red, k );  // Turn on buttons on press
     } );
+} );
 ```
 
 ## Documentation
@@ -47,14 +48,23 @@ written by Novation, but for some reason it is not available on their web site.
 All methods are also documented in the code, so your IDE should provide you with
 documentation and type annotation.
 
-**Overview:**
+**Table of Contents**
 
-* [Events](#Events) `connect` `disconnect` `key`
-* [Launchpad object](#Launchpad object)
-* [Methods](#Methods)
+* Overview:[Buttons](#buttons), [Colors](#colors) [Buffers](#buffers)
+* [Events](#events) `connect` `disconnect` `key`
+* [Launchpad object](#launchpad-object)
+* [Methods](#methods) – most used:
+  * [connect( port )](#padconnect-port-)
+  * [disconnect()](#paddisconnect)
+  * [reset()](#padreset-brightness-)
+  * [col( color, keys )](#padcol-color-buttons--promise)
+  * [setBuffers( args )](#padsetbuffers-args-)
+  * [isPressed( key )](#padispressed-button-)
+  * [fromMap( drawing )](##padfrommap-map-)
 
 
-**Buttons:**
+
+#### Buttons
 
 The Launchpad has
 
@@ -76,7 +86,7 @@ In code, the Automap buttons have column number 8 (not 0).
      7  [][][][][][][][] o
     (y)
 
-**Colors:** 
+#### Colors
 
 Launchpad buttons are lit by a red and a green LED each; combined, they give Amber.
 
@@ -113,7 +123,7 @@ Properties can be chained:
 pad.green.medium.copy   // medium green on both buffers
 ```
 
-**Buffers:**
+#### Buffers
 
 The Launchpad has two buffers `0` and `1` which contain two separate LED states. For example,
 in one buffer, all LEDs can be red, and in the other buffer, all LEDs can be green.
@@ -140,7 +150,9 @@ By alternating the displayed buffer, buttons can be made blinking.
 The launchpad object sends out events using the [Node.js EventEmitter](https://nodejs.org/dist/latest-v5.x/docs/api/events.html).
 Subscribe with e.g.
 
-    pad.on( 'connect', () => console.log( 'Launchpad connected!' ) ); 
+```js
+pad.on( 'connect', () => console.log( 'Launchpad connected!' ) );
+```
 
 #### connect
 
@@ -240,14 +252,18 @@ Probably useful if you have more than one Launchpad connected.
 Resets the pad's mapping mode, buffer settings, and duty cycle. The optional `brightness` parameter sets all LEDs 
 to the defined brightness between `1` (low) and `3` (high), other values switch the LEDs off.
 
-    pad.reset(); // Turn off all LEDs
+```js
+pad.reset(); // Turn off all LEDs
+```
 
 #### pad.col( color, buttons ): Promise
 
 Sets the color for the given buttons. The `buttons` parameter is either a value pair `[0,0]` to `[8,8]` specifying 
 a single button, or an array of such pairs. Example:
 
-    pad.col( Launchpad.GreenFull, [ [0,0], [1,1], [2,2] ] );
+```js
+pad.col( pad.green, [ [0,0], [1,1], [2,2] ] );
+```
 
 This function returns an ES6 promise. It is possible to send data much faster than it
 can be processed by Launchpad (according to their docs it is because they use a low-speed
@@ -404,7 +420,9 @@ as full brightness buttons. Medium brightness buttons are twice as bright as low
 
 Default is `1/5` when `num` and `den` are not given.
 
-    pad.multiplexing( 2, 4 );
+```js
+pad.multiplexing( 2, 4 );
+```
 
 ---
 
