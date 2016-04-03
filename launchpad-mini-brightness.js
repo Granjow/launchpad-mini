@@ -3,8 +3,6 @@
 var num = (new Array( 16 )).fill( 0 ).map( ( el, ix ) => ix + 1 ),
     den = (new Array( 16 )).fill( 0 ).map( ( el, ix ) => ix + 3 );
 
-console.log( num, den );
-
 let arr = num.map( nu => den.map( de => [ nu, de ] ) )
     .reduce( ( acc, cur ) => acc.concat( cur ), [] )
     .filter( pair => pair[ 0 ] <= pair[ 1 ] )
@@ -19,9 +17,6 @@ let arr = num.map( nu => den.map( de => [ nu, de ] ) )
 var getNumDen = function ( t ) {
     return arr[ Math.min( arr.length - 1, Math.max( 0, Math.round( t * arr.length ) ) ) ];
 };
-
-console.log( arr );
-console.log( getNumDen( 0 ), getNumDen( .5 ), getNumDen( 1 ) );
 
 module.exports = {
     getNumDen

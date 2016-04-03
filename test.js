@@ -27,8 +27,8 @@ pad.connect().then( ( msg ) => {
     if ( false ) {
         pad.col( 16, '4:xxx...xx' );
         pad.col( 3,
-            'a:x..x' +
-            's:..xx'
+            'A:x..x' +
+            'S:..xx'
         );
     }
 
@@ -53,7 +53,7 @@ pad.connect().then( ( msg ) => {
     pad.col( Launchpad.Off, [ 3, 8 ] );
     pad.col( Launchpad.GreenLow, [ 4, 8 ] );
     pad.col( Launchpad.GreenLow, [ 5, 8 ] );
-    pad.col( Launchpad.GreenLow, [ 6, 8 ] );
+    pad.col( Launchpad.Off, [ 6, 8 ] );
     pad.col( Launchpad.Off, [ 7, 8 ] );
     pad.on( 'key', pair => {
         if ( pair.pressed ) {
@@ -64,9 +64,11 @@ pad.connect().then( ( msg ) => {
         }
         if ( pair.pressed && pair.x === 8 ) {
             if ( pair.y === 0 ) {
-                pad.sendRaw( [ 0xb0, 0x00, 0x20 ] );
+                pad.displayBuffer = 0;
             } else if ( pair.y === 1 ) {
-                pad.sendRaw( [ 0xb0, 0x00, 0x21 ] );
+                pad.displayBuffer = 1;
+            } else if (pair.y === 2) {
+                pad.flash = true;
             } else if ( pair.y === 4 ) {
                 pad.sendRaw( [ 0xb0, 0x0, 0b110101 ] );
             }
@@ -108,10 +110,6 @@ pad.connect().then( ( msg ) => {
                     };
 
                 loop( 32 );
-            } else if ( pair.x === 6 ) {
-                pad.sendRaw( [ 0xb0, 0x00, 0x28 ] );
-            } else if ( pair.x === 7 ) {
-
             }
         }
     } );

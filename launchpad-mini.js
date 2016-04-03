@@ -141,13 +141,11 @@ Launchpad.prototype = {
 
     /**
      * Check if a button is pressed.
-     * @param {Number} x
-     * @param {Number} y
+     * @param {Array.<Number>} button [x,y] coordinates of the button to test
      * @returns {boolean}
-     * @todo Use array instead
      */
-    isPressed: function ( x, y ) {
-        return this._buttons.some( b => b.pressed && b.x === x && b.y === y );
+    isPressed: function ( button ) {
+        return this._buttons.some( b => b.pressed && b.x === button[ 0 ] && b.y === button[ 1 ] );
     },
 
     /**
@@ -196,10 +194,11 @@ Launchpad.prototype = {
 
     /**
      * Select which buffer the Launchpad uses for the LED button colors. Default is 0.
+     * Also disables flashing.
      * @param {Number} bufferNumber
      */
     set displayBuffer( bufferNumber ) {
-        this.setBuffers( { display: bufferNumber } );
+        this.setBuffers( { display: bufferNumber, flash: false } );
     },
 
     /**

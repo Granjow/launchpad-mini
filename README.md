@@ -252,6 +252,61 @@ loop( 32 );
 
 ---
 
+#### pad.flash
+
+Setter which enables button flashing. This activates a Launchpad internal routine which
+alternates the LED buffer which is displayed in an internal interval.
+
+If a LED is red in buffer `0` and off in buffer `1`, it will flash red as expected. If it
+is amber in buffer `1`, it will toggle between red and amber instead. If it is red in both
+buffers, there is no visual change.
+
+```js
+pad.flash = true;
+```
+
+#### pad.displayBuffer
+
+Getter and setter for choosing the buffer used for displaying the button colours.
+Can be set to `0` or `1`. Default is `0`.
+
+```js
+pad.displayBuffer;
+// -> 0
+pad.displayBuffer = 1;
+```
+
+#### pad.writeBuffer
+
+Getter and setter for the buffer where LED colours are written to.
+Can be set to `0` or `1`. Default is `0`.
+
+```js
+pad.writeBuffer;
+// -> 0
+pad.writeBuffer = 1;
+```
+
+#### setBuffers( args )
+
+Alternative interface for changing all buffer settings at once. The `args` parameter
+looks as follows:
+
+```js
+args = {
+    write: 0,               // Write buffer (0 or 1)
+    display: 0,             // Display buffer (0 or 1)
+    copyToDisplay: false,   // Copy write to display
+    flash: false            // Enable flashing
+}
+```
+
+`copyToDisplay` is useful if you want to change the display buffer while keeping the
+LED colours. The contents of the given write buffer (i.e. buffer `args.write`) are then
+written to the given display buffer (i.e. `args.display`).
+
+---
+
 #### pad.pressedButtons
 
 A getter, which returns an array of `[x,y]` pairs of buttons which are currently pressed.
@@ -259,6 +314,15 @@ A getter, which returns an array of `[x,y]` pairs of buttons which are currently
 ```js
 pad.pressedButtons
 // -> [ [0,0], [2,7] ]
+```
+
+#### pad.isPressed( button )
+
+Checks if the given `button` is pressed.
+
+```js
+pad.isPressed( [ 0, 1 ] );
+// -> true (if the top left grid button is pressed)
 ```
 
 ---
