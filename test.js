@@ -59,6 +59,9 @@ pad.connect().then( ( msg ) => {
             'xxx--xxx '
         ) );
 
+        // Want to directly use the key for setting the colour
+        pad.on( 'key', key => pad.col( Launchpad.GreenFull, key ) );
+
     }
 
     // Reset pad
@@ -83,9 +86,22 @@ pad.connect().then( ( msg ) => {
     pad.col( Launchpad.Off, [ 3, 8 ] );
     pad.col( Launchpad.GreenLow, [ 4, 8 ] );
     pad.col( Launchpad.GreenLow, [ 5, 8 ] );
-    pad.col( Launchpad.Off, [ 6, 8 ] );
+    pad.col( Launchpad.GreenLow, [ 6, 8 ] );
     pad.col( Launchpad.Off, [ 7, 8 ] );
     pad.on( 'key', pair => {
+        if ( pair.pressed ) {
+            pad.col( Launchpad.RedFull, pair );
+            pad.col( Launchpad.color( 1, 3, 'blink' ), pair );
+        } else {
+            pad.col( Launchpad.Off, pair );
+        }
+        if ( pair.pressed && pair.x === 8 ) {
+            if ( pair.y === 0 ) {
+                pad.sendRaw( [ 0xb0, 0x00, 0x20 ] );
+            } else if ( pair.y === 1 ) {
+                pad.sendRaw( [ 0xb0, 0x00, 0x21 ] );
+            }
+        }
         if ( pair.pressed && pair.y === 8 ) {
             if ( pair.x === 0 ) {
                 // Exit
@@ -123,6 +139,10 @@ pad.connect().then( ( msg ) => {
                     };
 
                 loop( 32 );
+            } else if ( pair.x === 6 ) {
+                pad.sendRaw( [ 0xb0, 0x00, 0x28 ] );
+            } else if ( pair.x === 7 ) {
+
             }
         }
     } );

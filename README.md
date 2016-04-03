@@ -6,11 +6,14 @@ Other node.js libraries exist, which you may want to consider as well, like:
 * [midi-launchpad](https://www.npmjs.com/package/midi-launchpad)
 * [phi-launchpad](https://www.npmjs.com/package/phi-launchpad)
 
-I am writing this yet-another-lauchpad-library because:
+This yet-another-lauchpad-library exists because other libraries did not compile, did not start,
+are no longer maintained, or lack some useful features.
 
-* phi-launchpad would be nice because it has support for double-buffering, but it does not even start for me
-* midi-launchpad works, but is no longer maintained
-* launchpadder works as well and is simple, but does not provide double-buffering
+Some of the bonus features of this library:
+
+* Auto-detects launchpad
+* Accurate documentation of Launchpad and library features
+* ES6 Promises avoid flooding the Launchpad (and corrupting button colours)
 
 ![Sample](img/smile.jpg)
 
@@ -95,7 +98,8 @@ Emitted when the ports have been closed, usually after calling `pad.disconnect()
 
 #### key
 
-Emitted when a key is pressed or released. An object of the following format is passed:
+Emitted when a key is pressed or released. The callback receives an object of
+the following format:
 
     { x: 1, y: 3, pressed: true }
 
@@ -104,6 +108,25 @@ Example usage:
 ```js
 pad.on( 'key', k => {
     console.log( `Key ${k.x},${k.y} down: ${k.pressed}`);
+} );
+```
+
+Actually, there are a few more properties defined on the object:
+
+    { x: 1, y: 3, pressed: true, 0: 1, 1: 3, length: 2 }
+
+The keys `0` and `1` allow to use the object like an array, and it can be passed
+to e.g. `.col` directly. Example for highlighting the pressed button:
+
+```js
+pad.on( 'key', pair => {
+    if ( pair.pressed ) {
+        // Red when button is pressed
+        pad.col( Launchpad.RedFull, pair );
+    } else {
+        // Off when button is released
+        pad.col( Launchpad.Off, pair );
+    }
 } );
 ```
 

@@ -231,7 +231,12 @@ Launchpad.prototype = {
             console.log( message[ 1 ], x, y );
 
             this._button( x, y ).pressed = pressed;
-            this.emit( 'key', { x: x, y: y, pressed: pressed } );
+            this.emit( 'key', {
+                x: x, y: y, pressed: pressed,
+                // Pretend to be an array so the returned object
+                // can be fed back to .col()
+                0: x, 1: y, length: 2
+            } );
 
         } else if ( message[ 0 ] === 0xb0 ) {
 
