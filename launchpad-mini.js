@@ -23,9 +23,6 @@ const
             return true;
         } );
     },
-    buttonsFromLine = function(str) {
-        
-    },
     or = function ( test, alternative ) {
         return test === undefined ? !!alternative : !!test;
     };
