@@ -434,32 +434,48 @@ Generates a coordinate array from a string pattern describing a button row or co
 `pattern` can also be an array of patterns.
 
 This function allows to visually specify buttons from any row/column instead of passing
-an array of x/y coordinates.
+an array of x/y coordinates. The following example would draw a lying heart:
 
 ```js
 pad.col( pad.red, pad.fromPattern( [
-    'r6 XX XXX XX',
-    'r7  xxx xxx',
-    'sc    xxx'
+    'r3    x',
+    'r4   x x',
+    'r5  x   x',
+    'r6 x  x  x',
+    'r7 X X X X',
+    'sc  x   x'
 ] ) );
 ```
 
 Format (case insensitive):
 
-    MM PPP...
+      8012345678 (index)
+    MM PPP...    (start with button 0)
+    MMpPPP...    (start with button 8)
 
-    MM = rN Row N,    e.g. r0 for the first button row
-         cN Column N, e.g. c2 for the 3rd button column
-         SC Scene buttons (equivalent to r8)
-         AM Automap buttons (equivalent to c8)
+    MM:  rN – Row N,    e.g. r0 for the first button row
+         cN – Column N, e.g. c2 for the 3rd button column
+         SC – Scene buttons (equivalent to r8)
+         AM – Automap buttons (equivalent to c8)
 
-    P = x or X
-          Select this button
-        . or any other character
-          Do not select this button
+    P:   x or X
+            – Select this button
+         . or any other character
+            – Do not select this button
 
     PPP... can be between 0 and 9 characters long.
 
+Scene and Automap buttons can be chosen in several ways. Example for the 5th Automap
+button on top:
+
+    AM ....x        Automap column, 5th button from left
+    c8 ....x        AM has column index 8
+    r4 ........X    5th row, 9th button from top (has index 8)
+    r4X             5th row, index “-1” (equivalent to previous version)
+                    No space after r4 modifier!
+
+Index 8 can be at the very beginning (visually corresponding to the physical Launchpad)
+or at the end (programmer’s perspective) of the pattern.
 
 #### pad.fromMap( map )
 

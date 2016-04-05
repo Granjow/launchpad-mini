@@ -19,27 +19,6 @@ pad.connect().then( ( msg ) => {
     // MIDI device inquiry
     // pad.sendRaw( [ 0xf0, 0x7e, 0x7f, 0x06, 0x01, 0xf7 ] );
 
-    if ( false ) {
-        pad.col( 16, '4:xxx...xx' );
-        pad.col( 3,
-            'A:x..x' +
-            'S:..xx' +
-            '2r:x  x x' // row
-        );
-        pad.col( 3, 'r4:014' );
-        pad.col( 3, 'r4:xx..x' );
-        pad.col( 3, [
-            'r4:xx..x',
-            'c2:...xxx',
-            'AM:x.x.x.x.',
-            'SC:x.x.x.x.' ] );
-        pad.col( 3, [
-            'r4 xx..x',
-            'c2 ...xxx',
-            'AM x.x.x.x.',
-            'SC x.x.x.x.' ] );
-    }
-
     // Reset pad
     pad.reset( 0 );
 
@@ -53,10 +32,14 @@ pad.connect().then( ( msg ) => {
     pad.writeBuffer = 0;
     pad.col( 3, [ [ 6, 0 ], [ 7, 0 ] ] );
 
+
     pad.col( pad.red, pad.fromPattern( [
-        'r6 XX XXX XX',
-        'r7  xxx xxx',
-        'sc    xxx'
+        'r3    x',
+        'r4   x x',
+        'r5  x   x',
+        'r6 x  x  x',
+        'r7 X X X X',
+        'sc  x   x'
     ] ) );
 
     // Esc button
