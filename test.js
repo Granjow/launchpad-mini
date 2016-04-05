@@ -28,6 +28,16 @@ pad.connect().then( ( msg ) => {
         );
         pad.col( 3, 'r4:014' );
         pad.col( 3, 'r4:xx..x' );
+        pad.col( 3, [
+            'r4:xx..x',
+            'c2:...xxx',
+            'AM:x.x.x.x.',
+            'SC:x.x.x.x.' ] );
+        pad.col( 3, [
+            'r4 xx..x',
+            'c2 ...xxx',
+            'AM x.x.x.x.',
+            'SC x.x.x.x.' ] );
     }
 
     // Reset pad

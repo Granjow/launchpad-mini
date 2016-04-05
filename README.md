@@ -133,7 +133,6 @@ freely, for example:
 
 
     ── Buffer 0  ──       ── Buffer 1  ──
-
     r r r r r r r r       g g g g g g g g
     r r r r r r ...       g g g g g g ...
     ...                   ...

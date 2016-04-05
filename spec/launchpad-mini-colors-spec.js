@@ -1,4 +1,4 @@
-var Color = require( '../launchpad-mini-colors' );
+var Color = require( '../lib/colors' );
 
 describe( 'Color assembly', function () {
     it( 'uses correct red brightness', () => {

@@ -4,8 +4,8 @@ const
     util = require( 'util' ),
     EventEmitter = require( 'events' ),
     midi = require( 'midi' ),
-    brightnessSteps = require( './launchpad-mini-brightness' ),
-    colors = require( './launchpad-mini-colors' );
+    brightnessSteps = require( './lib/brightness' ),
+    colors = require( './lib/colors' );
 
 const
     /**
@@ -22,6 +22,9 @@ const
             port.openPort( desc.portNumber );
             return true;
         } );
+    },
+    buttonsFromLine = function(str) {
+        
     },
     or = function ( test, alternative ) {
         return test === undefined ? !!alternative : !!test;
