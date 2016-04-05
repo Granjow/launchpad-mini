@@ -428,9 +428,44 @@ pad.multiplexing( 2, 4 );
 
 ---
 
+#### pad.fromPattern( pattern )
+
+Generates a coordinate array from a string pattern describing a button row or column.
+`pattern` can also be an array of patterns.
+
+This function allows to visually specify buttons from any row/column instead of passing
+an array of x/y coordinates.
+
+```js
+pad.col( pad.red, pad.fromPattern( [
+    'r6 XX XXX XX',
+    'r7  xxx xxx',
+    'sc    xxx'
+] ) );
+```
+
+Format (case insensitive):
+
+    MM PPP...
+
+    MM = rN Row N,    e.g. r0 for the first button row
+         cN Column N, e.g. c2 for the 3rd button column
+         SC Scene buttons (equivalent to r8)
+         AM Automap buttons (equivalent to c8)
+
+    P = x or X
+          Select this button
+        . or any other character
+          Do not select this button
+
+    PPP... can be between 0 and 9 characters long.
+
+
 #### pad.fromMap( map )
 
-Generates a coordinate array from a string map, like the template for the picture on top:
+Generates a coordinate array from a string map, like the template for the picture on top.
+Unlike `fromPattern`, buttons have to be specified consecutively, starting with the top left
+grid button. This function is mainly meant for visually specifying buttons on the whole pad.
 
 ```js
 pad.col( pad.green, pad.fromMap(

@@ -5,6 +5,7 @@ const
     EventEmitter = require( 'events' ),
     midi = require( 'midi' ),
     brightnessSteps = require( './lib/brightness' ),
+    buttons = require( './lib/buttons' ),
     colors = require( './lib/colors' );
 
 const
@@ -281,6 +282,20 @@ Launchpad.prototype = {
             }) )
             .filter( data => data.c === 'x' )
             .map( data => [ data.x, data.y ] );
+    },
+
+    /**
+     * Converts a string describing a row or column to button coordinates.
+     * @param {String|Array.<String>} pattern String pattern, or array of string patterns.
+     * String format is 'mod:pattern', with *mod* being one of rN (row N, e.g. r4), cN (column N), am (Automap), sc (Scene).
+     * *pattern* are buttons from 0 to 8, where an 'x' or 'X' marks the button as selected,
+     * and any other character is ignored; for example: 'x..xx' or 'X  XX'.
+     */
+    fromPattern: function ( pattern ) {
+        if ( pattern instanceof Array ) {
+            return buttons.decodeStrings( pattern );
+        }
+        return buttons.decodeString( pattern );
     },
 
     /** @type {Color} */

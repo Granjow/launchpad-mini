@@ -61,3 +61,18 @@ describe( 'Line parser', () => {
         expect( buttons.decodeString( 'AM ..X X' ) ).toEqual( [ [ 2, 8 ], [ 4, 8 ] ] );
     } );
 } );
+describe( 'Coordinate merger', () => {
+    it( 'removes duplicate coordinates', () => {
+        expect( buttons.uniqueCoords( [ [ 1, 2 ], [ 2, 1 ], [ 1, 2 ], [ 1, 2 ] ] ) ).toEqual( [ [ 1, 2 ], [ 2, 1 ] ] );
+        expect( buttons.uniqueCoords( [] ) ).toEqual( [] );
+        expect( buttons.uniqueCoords( [ [ 1, 2 ] ] ) ).toEqual( [ [ 1, 2 ] ] );
+    } );
+} );
+describe( 'Array parser', () => {
+    it( 'parses rows and columns', () => {
+        expect( buttons.decodeStrings( [ 'r1:x...x', 'c4:..xx' ] ) ).toEqual( [ [ 1, 0 ], [ 1, 4 ], [ 2, 4 ], [ 3, 4 ] ] );
+    } );
+    it( 'purges duplicate coordinates', () => {
+        expect( buttons.decodeStrings( [ 'r1:xx', 'c1:xxx' ] ) ).toEqual( [ [ 0, 1 ], [ 1, 0 ], [ 1, 1 ], [ 2, 1 ] ] );
+    } );
+} );

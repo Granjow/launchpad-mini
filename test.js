@@ -43,7 +43,7 @@ pad.connect().then( ( msg ) => {
     // Reset pad
     pad.reset( 0 );
 
-    pad.col( pad.green.copy, [ [ 0, 0 ], [ 1, 0 ], [ 2, 0 ] ] );
+    pad.col( pad.green.copy, pad.fromPattern( 'c0 xxx' ) );
     pad.col( pad.red, [ 0, 0 ] );
     pad.col( pad.red.copy, [ 1, 0 ] ); // copy
     pad.col( pad.red.clear, [ 2, 0 ] ); // clear
@@ -52,6 +52,12 @@ pad.connect().then( ( msg ) => {
     pad.col( 3, [ [ 4, 0 ], [ 5, 0 ] ] );
     pad.writeBuffer = 0;
     pad.col( 3, [ [ 6, 0 ], [ 7, 0 ] ] );
+
+    pad.col( pad.red, pad.fromPattern( [
+        'r6 XX XXX XX',
+        'r7  xxx xxx',
+        'sc    xxx'
+    ] ) );
 
     // Esc button
     pad.col( pad.red.full, [ 0, 8 ] );
