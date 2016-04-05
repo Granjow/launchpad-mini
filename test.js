@@ -19,11 +19,6 @@ pad.connect().then( ( msg ) => {
     // MIDI device inquiry
     // pad.sendRaw( [ 0xf0, 0x7e, 0x7f, 0x06, 0x01, 0xf7 ] );
 
-    // Top row: Automap/Live buttons set with 0x0b (Scene Launch buttons on the right are just row 8)
-    pad.sendRaw( [ 0xb0, 111, 32 ] );
-    // pad.sendRaw( [ 0x90, 104+4, 32 ] );
-    // pad.sendRaw( [ 0x90, 104+8, 32 ] );
-
     if ( false ) {
         pad.col( 16, '4:xxx...xx' );
         pad.col( 3,
@@ -31,27 +26,12 @@ pad.connect().then( ( msg ) => {
             'S:..xx' +
             '2r:x  x x' // row
         );
-
-        Launchpad.Red( 'full', 'copy' );
-        Launchpad.Green( 'medium', 'clear' );
-        Launchpad.Amber( 'low' );
-        Launchpad.Off();
-
-        Launchpad.Red().full();
-        Launchpad.Green().clear();
-        Launchpad.Off().copy();
-
-        pad.Red().full();
-        pad.Green().clear();
-        pad.Off().copy();
-
-        pad.red.full;
-        pad.green.clear;
-        pad.off.copy;
+        pad.col( 3, 'r4:014' );
+        pad.col( 3, 'r4:xx..x' );
     }
 
     // Reset pad
-    pad.reset( 2 );
+    pad.reset( 0 );
 
     pad.col( pad.green.copy, [ [ 0, 0 ], [ 1, 0 ], [ 2, 0 ] ] );
     pad.col( pad.red, [ 0, 0 ] );

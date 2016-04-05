@@ -117,7 +117,7 @@ pad.red.copy    // write buffer: red, other buffer: red
 pad.red.clear   // write buffer: red, other buffer: off
 ```
 
-Properties can be chained:
+Modifiers can be chained:
 
 ```js
 pad.green.medium.copy   // medium green on both buffers
@@ -132,14 +132,15 @@ By default, buffer `0` is used for displaying and for writing. The assignment ca
 freely, for example:
 
 
-    Buffer 0            Buffer 1
+    ── Buffer 0  ──       ── Buffer 1  ──
 
-    r r r r r r r r     g g g g g g g g
-    r r r r r r ...     g g g g g g ...
-    ...
-              ↑              ↑
-              └── display    │
-                  write to ──┘
+    r r r r r r r r       g g g g g g g g
+    r r r r r r ...       g g g g g g ...
+    ...                   ...
+    ───────────────       ────────────────
+              │                │
+              └── Display 0    │
+                  Write to 1 ──┘
 
 By alternating the displayed buffer, buttons can be made blinking.
 
@@ -164,8 +165,8 @@ Emitted when the ports have been closed, usually after calling `pad.disconnect()
 
 #### key
 
-Emitted when a key is pressed or released. The callback receives a `k` object of
-the following format:
+Emitted when a key is pressed or released. The callback receives a `k` object containing
+the x,y coordinates of the button and the state (pressed or not).
 
 ```js
 k = { x: 1, y: 3, pressed: true }
@@ -189,13 +190,13 @@ The keys `0` and `1` allow to use the object like an array, and it can be passed
 to e.g. `.col` directly. Example for highlighting the pressed button:
 
 ```js
-pad.on( 'key', pair => {
-    if ( pair.pressed ) {
+pad.on( 'key', k => {
+    if ( k.pressed ) {
         // Red when button is pressed
-        pad.col( pad.red, pair );
+        pad.col( pad.red, k );
     } else {
         // Off when button is released
-        pad.col( pad.off, pair );
+        pad.col( pad.off, k );
     }
 } );
 ```
@@ -217,8 +218,10 @@ let pad = new Launchpad();
 Contains predefined button coordinates:
 
 ```js
-Launchpad.Buttons.All  // All buttons
-Launchpad.Buttons.Grid // 8x8 Grid buttons
+Launchpad.Buttons.All       // All buttons
+Launchpad.Buttons.Grid      // 8x8 Grid buttons
+Launchpad.Buttons.Automap   // Automap buttons (top row)
+Launchpad.Buttons.Scene     // Scene buttons (right row)
 ```
 
 ---

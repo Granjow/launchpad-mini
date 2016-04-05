@@ -1,6 +1,6 @@
 {
   "name": "launchpad-mini",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Simon A. Eugster <simon.eu@gmail.com>",
   "main": "./launchpad-mini.js",
   "repository": {

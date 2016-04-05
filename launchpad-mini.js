@@ -292,7 +292,7 @@ Launchpad.prototype = {
     /**
      * Due to limitations in LED levels, only full brightness is available for yellow,
      * the other modifier versions have no effect.
-     * @type {Color} 
+     * @type {Color}
      */
     yellow: colors.yellow,
     /** @type {Color} */
@@ -345,8 +345,26 @@ util.inherits( Launchpad, EventEmitter );
 // Button Groups
 
 Launchpad.Buttons = {
+    /**
+     * All Launchpad buttons
+     * @type {Array.<Number>}
+     */
     All: (new Array( 80 )).fill( 0 ).map( ( empty, ix ) => [ ix % 9, (ix - ix % 9) / 9 ] ),
-    Grid: (new Array( 64 )).fill( 0 ).map( ( empty, ix ) => [ ix % 8, (ix - ix % 8) / 8 ] )
+    /**
+     * Grid buttons (8×8 square buttons)
+     * @type {Array.<Number>}
+     */
+    Grid: (new Array( 64 )).fill( 0 ).map( ( empty, ix ) => [ ix % 8, (ix - ix % 8) / 8 ] ),
+    /**
+     * Automap buttons (top row of round buttons)
+     * @type {Array.<Number>}
+     */
+    Automap: (new Array( 8 )).fill( 0 ).map( ( empty, ix ) => [ ix, 8 ] ),
+    /**
+     * Scene buttons (right row of round buttons)
+     * @type {Array.<Number>}
+     */
+    Scene: (new Array( 8 )).fill( 0 ).map( ( empty, ix ) => [ 8, ix ] )
 };
 
 module.exports = Launchpad;
