@@ -2,7 +2,7 @@
   "name": "launchpad-mini",
   "version": "1.1.0",
   "author": {
-    "name":"Simon A. Eugster",
+    "name": "Simon A. Eugster",
     "email": "simon.eu@gmail.com",
     "url": "http://granjow.net/"
   },
@@ -13,6 +13,9 @@
   "repository": {
     "type": "git",
     "url": "git@github.com:Granjow/launchpad-mini.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Granjow/launchpad-mini/issues"
   },
   "homepage": "https://github.com/Granjow/launchpad-mini",
   "keywords": [
