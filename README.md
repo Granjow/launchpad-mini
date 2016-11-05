@@ -50,7 +50,7 @@ documentation and type annotation.
 
 **Table of Contents**
 
-* Overview:[Buttons](#buttons), [Colors](#colors) [Buffers](#buffers)
+* Overview: [Buttons](#buttons), [Colors](#colors) [Buffers](#buffers)
 * [Events](#events) `connect` `disconnect` `key`
 * [Launchpad object](#launchpad-object)
 * [Methods](#methods) – most used:
