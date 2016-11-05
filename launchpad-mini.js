@@ -36,7 +36,10 @@ const Launchpad = function () {
 
     this.midiIn.on( 'message', ( dt, msg ) => this._processMessage( dt, msg ) );
 
-    /** @type {Array.<{pressed:Boolean, x:Number, y:Number, cmd:Number, key:Number}>} */
+    /**
+     * Storage format: [ {x0 y0}, {x1 y0}, ...{x9 y0}, {x0 y1}, {x1 y1}, ... ]
+     * @type {Array.<{pressed:Boolean, x:Number, y:Number, cmd:Number, key:Number}>}
+     */
     this._buttons = (new Array( 9 * 9 - 1 )).fill( 0 )
         .map( ( el, ix ) => ({
             pressed: false,
@@ -276,10 +279,10 @@ Launchpad.prototype = {
      */
     fromMap: function ( map ) {
         return Array.prototype.map.call( map, ( char, ix ) => ({
-                x: ix % 9,
-                y: (ix - (ix % 9)) / 9,
-                c: char
-            }) )
+            x: ix % 9,
+            y: (ix - (ix % 9)) / 9,
+            c: char
+        }) )
             .filter( data => data.c === 'x' )
             .map( data => [ data.x, data.y ] );
     },
@@ -322,36 +325,35 @@ Launchpad.prototype = {
 
     _processMessage: function ( deltaTime, message ) {
 
+        var x, y, pressed;
+
         if ( message[ 0 ] === 0x90 ) {
 
             // Grid pressed
-            let x = message[ 1 ] % 0x10,
-                y = (message[ 1 ] - x) / 0x10,
-                pressed = message[ 2 ] > 0;
-
-            console.log( message[ 1 ], x, y );
-
-            this._button( [ x, y ] ).pressed = pressed;
-            this.emit( 'key', {
-                x: x, y: y, pressed: pressed,
-                // Pretend to be an array so the returned object
-                // can be fed back to .col()
-                0: x, 1: y, length: 2
-            } );
+            x = message[ 1 ] % 0x10;
+            y = (message[ 1 ] - x) / 0x10;
+            pressed = message[ 2 ] > 0;
 
         } else if ( message[ 0 ] === 0xb0 ) {
 
             // Automap/Live button
-            let x = message[ 1 ] - 0x68,
-                y = 8,
-                pressed = message[ 2 ] > 0;
-
-            this._button( [ x, y ] ).pressed = pressed;
-            this.emit( 'key', { x: x, y: y, pressed: pressed } );
+            x = message[ 1 ] - 0x68;
+            y = 8;
+            pressed = message[ 2 ] > 0;
 
         } else {
             console.log( `Unknown message: ${message} at ${deltaTime}` );
+            return;
         }
+
+
+        this._button( [ x, y ] ).pressed = pressed;
+        this.emit( 'key', {
+            x: x, y: y, pressed: pressed,
+            // Pretend to be an array so the returned object
+            // can be fed back to .col()
+            0: x, 1: y, length: 2
+        } );
     }
 
 };
