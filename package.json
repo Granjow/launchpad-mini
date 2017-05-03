@@ -1,6 +1,7 @@
 {
   "name": "launchpad-mini",
   "version": "1.1.1",
+  "license": "MIT",
   "author": {
     "name": "Simon A. Eugster",
     "email": "simon.eu@gmail.com",
