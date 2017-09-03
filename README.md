@@ -52,17 +52,17 @@ documentation and type annotation.
 
 **Table of Contents**
 
-* Overview: [Buttons](#buttons), [Colors](#colors) [Buffers](#buffers)
+* Overview: [Buttons](#buttons), [Colors](#colors), [Buffers](#buffers)
 * [Events](#events) `connect` `disconnect` `key`
 * [Launchpad object](#launchpad-object)
 * [Methods](#methods) – most used:
-  * [connect( port )](#padconnect-port-)
-  * [disconnect()](#paddisconnect)
-  * [reset()](#padreset-brightness-)
-  * [col( color, keys )](#padcol-color-buttons--promise)
-  * [setBuffers( args )](#padsetbuffers-args-)
-  * [isPressed( key )](#padispressed-button-)
-  * [fromMap( drawing )](##padfrommap-map-)
+  * Connect with [connect( port )](#padconnect-port-)
+  * Disconnect with [disconnect()](#paddisconnect)
+  * Flush with color with [reset()](#padreset-brightness-)
+  * Set button color(s) with [col( color, keys )](#padcol-color-buttons--promise)
+  * Define which buffer is displayed with [setBuffers( args )](#padsetbuffers-args-)
+  * Check if a key is pressed with [isPressed( key )](#padispressed-button-)
+  * Get buttons based on a string array with [fromMap( drawing )](##padfrommap-map-)
 
 
 
