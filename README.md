@@ -1,19 +1,14 @@
-JavaScript library for interacting with the Novation Launchpad Mini.
+JavaScript library for interacting with the Novation’s midi board LAUNCHPAD MINI.
 
-Other node.js libraries exist, which you may want to consider as well, like:
-
-* [launchpadder](https://www.npmjs.com/package/launchpadder)
-* [midi-launchpad](https://www.npmjs.com/package/midi-launchpad)
-* [phi-launchpad](https://www.npmjs.com/package/phi-launchpad)
+This library is based on ES6 and works with `Promise`s. It also *auto-detects* you Launchpad and provides
+accurate documentation of the library and the Launchpad itself.
 
 This yet-another-lauchpad-library exists because other libraries did not compile, did not start,
-are no longer maintained, or lack some useful features.
+are no longer maintained, or lack some useful features. Nevertheless, take a look at
+[launchpadder](https://www.npmjs.com/package/launchpadder),
+[midi-launchpad](https://www.npmjs.com/package/midi-launchpad),
+and [phi-launchpad](https://www.npmjs.com/package/phi-launchpad), which you might like as well.
 
-Some of the bonus features of this library:
-
-* Auto-detects launchpad
-* Accurate documentation of Launchpad and library features
-* ES6 Promises avoid flooding the Launchpad (and corrupting button colours)
 
 ![Sample](img/smile.jpg)
 
@@ -31,6 +26,13 @@ pad.connect().then( () => {     // Auto-detect Launchpad
     } );
 } );
 ```
+
+## Installation
+
+    npm install --save launchpad-mini
+
+`launchpad-mini` depends on [midi](https://www.npmjs.com/package/midi); see the requirements for your OS there.
+On Linux, usually install `libasound2-dev` and you are good. 
 
 ## Documentation
 
