@@ -10,7 +10,7 @@ are no longer maintained, or lack some useful features. Nevertheless, take a loo
 and [phi-launchpad](https://www.npmjs.com/package/phi-launchpad), which you might like as well.
 
 
-![Sample](img/smile.jpg)
+![Sample](img/patterns.gif)
 
 ## Usage
 
