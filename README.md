@@ -319,7 +319,7 @@ pad.setColors( [
     [ 0, 0, Launchpad.Colors.green ],
     [ 1, 1, Launchpad.Colors.red ],
     [ 2, 2, Launchpad.Colors.amber ]
-] );
+] ).then( () => console.log( 'Colors updated.' ) );
 ``` 
 
 ---

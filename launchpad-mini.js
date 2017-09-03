@@ -201,7 +201,7 @@ class Launchpad extends EventEmitter {
      */
     setColors( buttonsWithColor ) {
         buttonsWithColor.forEach( btn => this.setSingleButtonColor( btn, btn[ 2 ] ) );
-        return new Promise( ( res, rej ) => setTimeout( res, buttonsWithColor.length / 20 ) );
+        return new Promise( ( res ) => setTimeout( res, buttonsWithColor.length / 20 ) );
     }
 
     setSingleButtonColor( xy, color ) {
