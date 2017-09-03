@@ -1,7 +1,8 @@
 JavaScript library for interacting with the Novation’s midi board LAUNCHPAD MINI.
 
 This library is based on ES6 and works with `Promise`s. It also *auto-detects* you Launchpad and provides
-accurate documentation of the library and the Launchpad itself.
+accurate documentation of the library and the Launchpad itself. For latter, check the 
+[git repository](https://github.com/Granjow/launchpad-mini/tree/master/doc).
 
 This yet-another-lauchpad-library exists because other libraries did not compile, did not start,
 are no longer maintained, or lack some useful features. Nevertheless, take a look at
