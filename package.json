@@ -11,6 +11,9 @@
   "bin": {
     "launchpad-mini-test": "./test.js"
   },
+  "scripts": {
+    "test": "jasmine"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:Granjow/launchpad-mini.git"

@@ -186,12 +186,30 @@ class Launchpad extends EventEmitter {
             return new Promise( ( res, rej ) => setTimeout( res, buttons.length / 20 ) );
 
         } else {
-            var b = this._button( buttons );
+            let b = this._button( buttons );
             if ( b ) {
                 this.sendRaw( [ b.cmd, b.key, color.code || color ] );
             }
-            return new Promise( ( res, rej ) => res( !!b ) );
+            return Promise.resolve( !!b );
         }
+    }
+
+    /**
+     * Set colors for multiple buttons.
+     * @param {Array.<Array.<>>} buttonsWithColor Array containing entries of the form [x,y,color].
+     * @returns {Promise}
+     */
+    setColors( buttonsWithColor ) {
+        buttonsWithColor.forEach( btn => this.setSingleButtonColor( btn, btn[ 2 ] ) );
+        return new Promise( ( res, rej ) => setTimeout( res, buttonsWithColor.length / 20 ) );
+    }
+
+    setSingleButtonColor( xy, color ) {
+        let b = this._button( xy );
+        if ( b ) {
+            this.sendRaw( [ b.cmd, b.key, color.code || color ] );
+        }
+        return !!b;
     }
 
     /**
@@ -260,7 +278,7 @@ class Launchpad extends EventEmitter {
      * @param {Number=} den Denominator, between 3 and 18, default=5
      */
     multiplexing( num, den ) {
-        var data,
+        let data,
             cmd;
         num = Math.max( 1, Math.min( num || 1, 16 ) );
         den = Math.max( 3, Math.min( den || 5, 18 ) );
@@ -329,7 +347,7 @@ class Launchpad extends EventEmitter {
 
     _processMessage( deltaTime, message ) {
 
-        var x, y, pressed;
+        let x, y, pressed;
 
         if ( message[ 0 ] === 0x90 ) {
 
@@ -388,5 +406,7 @@ Launchpad.Buttons = {
      */
     Scene: (new Array( 8 )).fill( 0 ).map( ( empty, ix ) => [ 8, ix ] )
 };
+
+Launchpad.Colors = colors;
 
 module.exports = Launchpad;

@@ -108,6 +108,17 @@ pad.connect().then( ( msg ) => {
                     };
 
                 loop( 32 );
+            } else if ( pair.x === 6 ) {
+                pad.setColors( [
+                    [ 0, 0, Launchpad.Colors.green ],
+                    [ 1, 1, Launchpad.Colors.red ],
+                    [ 2, 2, Launchpad.Colors.green ],
+                    [ 3, 3, Launchpad.Colors.red ],
+                    [ 4, 4, Launchpad.Colors.green ],
+                    [ 5, 5, Launchpad.Colors.red ],
+                    [ 6, 6, Launchpad.Colors.green ],
+                    [ 7, 7, Launchpad.Colors.red ]
+                ] );
             }
         }
     } );

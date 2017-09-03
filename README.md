@@ -31,7 +31,7 @@ pad.connect().then( () => {     // Auto-detect Launchpad
 
     npm install --save launchpad-mini
 
-`launchpad-mini` depends on [midi](https://www.npmjs.com/package/midi); see the requirements for your OS there.
+Node.js >=4.8.4 is required. Also, `launchpad-mini` depends on [midi](https://www.npmjs.com/package/midi); see the requirements for your OS there.
 On Linux, usually install `libasound2-dev` and you are good. 
 
 ## Documentation
@@ -95,9 +95,9 @@ Launchpad buttons are lit by a red and a green LED each; combined, they give Amb
 Yellow also kind of exists, but the colour difference is marginal and only visible
 on full power level, therefore others are not provided.
 ```js
-pad.red
-pad.green
-pad.amber
+pad.red     // Or: Launchpad.Colors.red
+pad.green   // Or: Launchpad.Colors.green
+pad.amber   // etc.
 pad.off
 pad.yellow
 ```
@@ -156,15 +156,15 @@ Subscribe with e.g.
 pad.on( 'connect', () => console.log( 'Launchpad connected!' ) );
 ```
 
-#### connect
+#### `connect`
 
 Emitted when connection to a Launchpad has been established.
 
-#### disconnect
+#### `disconnect`
 
 Emitted when the ports have been closed, usually after calling `pad.disconnect()`.
 
-#### key
+#### `key`
 
 Emitted when a key is pressed or released. The callback receives a `k` object containing
 the x,y coordinates of the button and the state (pressed or not).
@@ -307,6 +307,20 @@ let btns = Launchpad.Buttons.All,
 
 loop( 32 );
 ```
+
+#### pad.setColors( buttonsWithColor )
+
+Just like `pad.col()`, but allows to set an individual color for each button. Pass an array
+of `[ x, y, col ]` objects to this function.
+
+
+```js
+pad.setColors( [
+    [ 0, 0, Launchpad.Colors.green ],
+    [ 1, 1, Launchpad.Colors.red ],
+    [ 2, 2, Launchpad.Colors.amber ]
+] );
+``` 
 
 ---
 
