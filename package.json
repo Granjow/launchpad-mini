@@ -9,7 +9,6 @@
   },
   "main": "./launchpad-mini.js",
   "bin": {
-    "launchpad-mini-test": "./test.js",
     "launchpad-mini-print-buttons": "./examples/print-selected-buttons.js"
   },
   "scripts": {
