@@ -5,6 +5,7 @@ const
     EventEmitter = require( 'events' ),
     midi = require( 'midi' ),
     brightnessSteps = require( './lib/brightness' ),
+    Buttons = require( './lib/button-list' ),
     buttons = require( './lib/buttons' ),
     colors = require( './lib/colors' );
 
@@ -41,13 +42,13 @@ class Launchpad extends EventEmitter {
 
         /**
          * Storage format: [ {x0 y0}, {x1 y0}, ...{x9 y0}, {x0 y1}, {x1 y1}, ... ]
-         * @type {Array.<{pressed:Boolean, x:Number, y:Number, cmd:Number, key:Number}>}
+         * @type {Array.<{pressed:Boolean, x:Number, y:Number, cmd:Number, key:Number, id:Symbol}>}
          */
-        this._buttons = (new Array( 9 * 9 - 1 )).fill( 0 )
-            .map( ( el, ix ) => ({
-                pressed: false,
-                y: (ix - ix % 9) / 9,
-                x: ix % 9
+        this._buttons = Buttons.All
+            .map( b => ({
+                x: b[ 0 ],
+                y: b[ 1 ],
+                id: b.id
             }) )
             .map( b => {
                 b.cmd = b.y >= 8 ? 0xb0 : 0x90;
@@ -160,7 +161,7 @@ class Launchpad extends EventEmitter {
      */
     get pressedButtons() {
         return this._buttons.filter( b => b.pressed )
-            .map( b => [ b.x, b.y ] );
+            .map( b => Buttons.byXy( b.x, b.y ) );
     }
 
     /**
@@ -321,7 +322,7 @@ class Launchpad extends EventEmitter {
             c: char
         }) )
             .filter( data => data.c === 'x' )
-            .map( data => [ data.x, data.y ] );
+            .map( data => Buttons.byXy( data.x, data.y ) );
     }
 
     /**
@@ -335,14 +336,15 @@ class Launchpad extends EventEmitter {
         if ( pattern instanceof Array ) {
             return buttons.decodeStrings( pattern );
         }
-        return buttons.decodeString( pattern );
+        return buttons.decodeString( pattern )
+            .map( xy => Buttons.byXy( xy[ 0 ], xy[ 1 ] ) );
     }
 
     /**
-     * @returns {{pressed: Boolean, x: Number, y: Number, cmd:Number, key:Number}} Button at given coordinates
+     * @returns {{pressed: Boolean, x: Number, y: Number, cmd:Number, key:Number, id:Symbol}} Button at given coordinates
      */
-    _button( pair ) {
-        return this._buttons[ 9 * pair[ 1 ] + pair[ 0 ] ];
+    _button( xy ) {
+        return this._buttons[ 9 * xy[ 1 ] + xy[ 0 ] ];
     }
 
     _processMessage( deltaTime, message ) {
@@ -369,9 +371,10 @@ class Launchpad extends EventEmitter {
         }
 
 
-        this._button( [ x, y ] ).pressed = pressed;
+        let button = this._button( [ x, y ] );
+        button.pressed = pressed;
         this.emit( 'key', {
-            x: x, y: y, pressed: pressed,
+            x: x, y: y, pressed: pressed, id: button.id,
             // Pretend to be an array so the returned object
             // can be fed back to .col()
             0: x, 1: y, length: 2
@@ -384,28 +387,7 @@ util.inherits( Launchpad, EventEmitter );
 
 // Button Groups
 
-Launchpad.Buttons = {
-    /**
-     * All Launchpad buttons
-     * @type {Array.<Number>}
-     */
-    All: (new Array( 80 )).fill( 0 ).map( ( empty, ix ) => [ ix % 9, (ix - ix % 9) / 9 ] ),
-    /**
-     * Grid buttons (8×8 square buttons)
-     * @type {Array.<Number>}
-     */
-    Grid: (new Array( 64 )).fill( 0 ).map( ( empty, ix ) => [ ix % 8, (ix - ix % 8) / 8 ] ),
-    /**
-     * Automap buttons (top row of round buttons)
-     * @type {Array.<Number>}
-     */
-    Automap: (new Array( 8 )).fill( 0 ).map( ( empty, ix ) => [ ix, 8 ] ),
-    /**
-     * Scene buttons (right row of round buttons)
-     * @type {Array.<Number>}
-     */
-    Scene: (new Array( 8 )).fill( 0 ).map( ( empty, ix ) => [ 8, ix ] )
-};
+Launchpad.Buttons = Buttons;
 
 Launchpad.Colors = colors;
 

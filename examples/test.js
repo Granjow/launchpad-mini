@@ -1,7 +1,7 @@
-'use strict';
+#!/usr/bin/env node
 
 const
-    Launchpad = require( './launchpad-mini' );
+    Launchpad = require( '../launchpad-mini' );
 
 let pad = new Launchpad();
 

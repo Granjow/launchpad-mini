@@ -16,14 +16,14 @@ and [phi-launchpad](https://www.npmjs.com/package/phi-launchpad), which you migh
 ## Usage
 
 ```js
-'use strict';
 const Launchpad = require( 'launchpad-mini' ),
       pad = new Launchpad();
 
 pad.connect().then( () => {     // Auto-detect Launchpad
     pad.reset( 2 );             // Make Launchpad glow yellow
     pad.on( 'key', k => {
-        pad.col( pad.red, k );  // Turn on buttons on press
+        // Make button red while pressed, green after pressing
+        pad.col( k.pressed ? pad.red : pad.green, k );
     } );
 } );
 ```
@@ -47,6 +47,11 @@ For the Launchpad Mini, see the Programmer’s Manual in this repository’s `do
 written by Novation, but for some reason it is not available on their web site.
 
 ## API
+
+*Changes since 2.0.0*
+
+* All buttons now have a property `id : Symbol` which uniquely identifies the button.
+* To conveniently draw patterns, run `node_modules/.bin/launchpad-mini-print-buttons`
 
 All methods are also documented in the code, so your IDE should provide you with
 documentation and type annotation.
@@ -217,7 +222,7 @@ let pad = new Launchpad();
 
 #### Launchpad.Buttons
 
-Contains predefined button coordinates:
+Contains predefined button coordinates as arrays like `[[0,0],[0,1],[0,2],...,[9,8]]`.
 
 ```js
 Launchpad.Buttons.All       // All buttons

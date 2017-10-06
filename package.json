@@ -9,7 +9,8 @@
   },
   "main": "./launchpad-mini.js",
   "bin": {
-    "launchpad-mini-test": "./test.js"
+    "launchpad-mini-test": "./test.js",
+    "launchpad-mini-print-buttons": "./examples/print-selected-buttons.js"
   },
   "scripts": {
     "test": "jasmine"
@@ -34,6 +35,8 @@
     "node": ">=5.0.0"
   },
   "devDependencies": {
-    "jasmine": "^2.4.1"
+    "@types/jasmine": "^2.6.0",
+    "jasmine": "^2.4.1",
+    "jasmine-console-reporter": "^2.0.1"
   }
 }
