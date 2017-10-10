@@ -13,6 +13,10 @@ describe( 'Launchpad Mini buttons:', () => {
             } );
         } );
 
+        it( 'uses the same IDs on multiple instances', () => {
+            expect( require( '../lib/button-list' ).All[ 0 ].id ).toBe( Buttons.All[ 0 ].id );
+        } );
+
     } );
 
     describe( 'Object Grid', () => {

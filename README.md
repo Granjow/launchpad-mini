@@ -176,7 +176,7 @@ Emitted when a key is pressed or released. The callback receives a `k` object co
 the x,y coordinates of the button and the state (pressed or not).
 
 ```js
-k = { x: 1, y: 3, pressed: true }
+k = { x: 1, y: 3, pressed: true, id: Symbol() }
 ```
 
 Example usage:
