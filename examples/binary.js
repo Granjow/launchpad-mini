@@ -1,5 +1,4 @@
-const Launchpad = require( 'launchpad-mini' );
-// import Launchpad from 'launchpad-mini';
+const Launchpad = require( '../launchpad' );
 
 let pad = new Launchpad();
 
