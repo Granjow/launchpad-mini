@@ -69,7 +69,7 @@ documentation and type annotation.
   * Define which buffer is displayed with [setBuffers( args )](#padsetbuffers-args-)
   * Check if a key is pressed with [isPressed( key )](#padispressed-button-)
   * Get buttons based on a string array with [fromMap( drawing )](##padfrommap-map-)
-
+* [Examples](#examples)
 
 
 #### Buttons
@@ -542,3 +542,10 @@ pad.fromMap(
     'oooooooo '
 )
 ```
+### Examples
+
+`print-selected-buttons.js` Prints the xy coordinates of the currently pressed buttons.
+
+`binary.js` Allows you to set an 8 bit integer's binary digits, and show the resulting number on the pad.
+
+`example.js` Pressed buttons become red, released buttons become green.
