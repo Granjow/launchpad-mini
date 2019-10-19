@@ -1,84 +1,95 @@
-'use strict';
+import { Color } from './lib/colors';
+import { ButtonItem } from './lib/button-list';
 
-const
-    util = require( 'util' ),
-    EventEmitter = require( 'events' ),
-    midi = require( 'midi' ),
-    brightnessSteps = require( './lib/brightness' ),
-    Buttons = require( './lib/button-list' ),
-    buttons = require( './lib/buttons' ),
-    colors = require( './lib/colors' );
+const EventEmitter = require( 'events' );
+const midi = require( 'midi' );
+const brightnessSteps = require( './lib/brightness' );
+const Buttons = require( './lib/button-list' );
+const buttons = require( './lib/buttons' );
+const colors = require( './lib/colors' );
+
+interface ButtonInfo {
+    cmd : number;
+    key : number;
+    pressed : boolean,
+    x : number;
+    y : number;
+    id : Symbol;
+}
+
+interface BufferArgs {
+    write? : Number;
+    display? : Number;
+    copyToDisplay? : Boolean;
+    flash? : Boolean;
+}
+
+enum Events {
+    key = 'key',
+    connect = 'connect',
+    disconnect = 'disconnect',
+}
 
 const
     /**
      * @param port MIDI port object
      * @returns {Array.<{portNumber:Number, portName:String}>}>}
      */
-    findLaunchpadPorts = function ( port ) {
-        return (new Array( port.getPortCount() )).fill( 0 )
-            .map( ( nil, portNumber ) => ({ portNumber: portNumber, portName: port.getPortName( portNumber ) }) )
+    findLaunchpadPorts = function ( port : any ) {
+        return ( new Array( port.getPortCount() ) ).fill( 0 )
+            .map( ( nil, portNumber ) => ( { portNumber: portNumber, portName: port.getPortName( portNumber ) } ) )
             .filter( desc => desc.portName.indexOf( 'Launchpad' ) >= 0 );
     },
-    connectFirstPort = function ( port ) {
+    connectFirstPort = function ( port : any ) {
         return findLaunchpadPorts( port ).some( desc => {
             port.openPort( desc.portNumber );
             return true;
         } );
     },
-    or = function ( test, alternative ) {
+    or = function ( test : any, alternative : any ) {
         return test === undefined ? !!alternative : !!test;
     };
 
-class Launchpad extends EventEmitter {
+export class Launchpad {
 
     constructor() {
 
-        super();
+        this.midiIn = new midi.Input();
+        this.midiOut = new midi.Output();
 
-        this.midiIn = new midi.input();
-        this.midiOut = new midi.output();
-
-        this.midiIn.on( 'message', ( dt, msg ) => this._processMessage( dt, msg ) );
+        this.midiIn.on( 'message', ( dt : number, msg : string ) => this._processMessage( dt, msg ) );
 
         /**
          * Storage format: [ {x0 y0}, {x1 y0}, ...{x9 y0}, {x0 y1}, {x1 y1}, ... ]
          * @type {Array.<{pressed:Boolean, x:Number, y:Number, cmd:Number, key:Number, id:Symbol}>}
          */
         this._buttons = Buttons.All
-            .map( b => ({
+            .map( ( b : ButtonItem ) => ( {
                 x: b[ 0 ],
                 y: b[ 1 ],
                 id: b.id
-            }) )
-            .map( b => {
-                b.cmd = b.y >= 8 ? 0xb0 : 0x90;
-                b.key = b.y >= 8 ? 0x68 + b.x : 0x10 * b.y + b.x;
-                return b;
-            } );
+            } ) )
+            .map( ( b : { x : number, y : number, id : Symbol } ) => ( {
+                x: b.x,
+                y: b.y,
+                cmd: b.y >= 8 ? 0xb0 : 0x90,
+                key: b.y >= 8 ? 0x68 + b.x : 0x10 * b.y + b.x,
+                pressed: false,
+            } ) );
 
-        /** @type {Number} */
         this._writeBuffer = 0;
-
-        /** @type {Number} */
         this._displayBuffer = 0;
-
-        /** @type {Boolean} */
         this._flashing = false;
 
 
-        /** @type {Color} */
         this.red = colors.red;
-        /** @type {Color} */
         this.green = colors.green;
-        /** @type {Color} */
         this.amber = colors.amber;
         /**
          * Due to limitations in LED levels, only full brightness is available for yellow,
          * the other modifier versions have no effect.
-         * @type {Color}
          */
         this.yellow = colors.yellow;
-        /** @type {Color} */
         this.off = colors.off;
 
         return this;
@@ -89,7 +100,7 @@ class Launchpad extends EventEmitter {
      * @param {Number=} port MIDI port number to use. By default, the first MIDI port where a Launchpad is found
      * will be used. See availablePorts for a list of Launchpad ports (in case more than one is connected).
      */
-    connect( port ) {
+    connect( port : number ) {
         return new Promise( ( res, rej ) => {
 
             if ( port !== undefined ) {
@@ -97,7 +108,7 @@ class Launchpad extends EventEmitter {
                 try {
                     this.midiIn.openPort( port );
                     this.midiOut.openPort( port );
-                    this.emit( 'connect' );
+                    setImmediate( () => this._events.emit( Events.connect ) );
                     res( 'Launchpad connected' );
                 } catch ( e ) {
                     rej( `Cannot connect on port ${port}: ` + e );
@@ -110,7 +121,7 @@ class Launchpad extends EventEmitter {
                     oOk = connectFirstPort( this.midiOut );
 
                 if ( iOk && oOk ) {
-                    this.emit( 'connect' );
+                    setImmediate( () => this._events.emit( Events.connect ) );
                     res( 'Launchpad connected.' );
                 } else {
                     rej( `No Launchpad on MIDI ports found.` );
@@ -125,7 +136,8 @@ class Launchpad extends EventEmitter {
     disconnect() {
         this.midiIn.closePort();
         this.midiOut.closePort();
-        this.emit( 'disconnect' );
+
+        setImmediate( () => this._events.emit( Events.disconnect ) );
     }
 
     /**
@@ -134,12 +146,12 @@ class Launchpad extends EventEmitter {
      * @param {Number=} brightness If given, all LEDs will be set to the brightness level (1 = low, 3 = high).
      * If undefined (or any other number), all LEDs will be turned off.
      */
-    reset( brightness ) {
+    reset( brightness : number ) {
         brightness = brightness > 0 && brightness <= 3 ? brightness + 0x7c : 0;
         this.sendRaw( [ 0xb0, 0x00, brightness ] )
     }
 
-    sendRaw( data ) {
+    sendRaw( data : number[] ) {
         this.midiOut.sendMessage( data );
     }
 
@@ -169,7 +181,7 @@ class Launchpad extends EventEmitter {
      * @param {Array.<Number>} button [x,y] coordinates of the button to test
      * @returns {boolean}
      */
-    isPressed( button ) {
+    isPressed( button : number[] ) {
         return this._buttons.some( b => b.pressed && b.x === button[ 0 ] && b.y === button[ 1 ] );
     }
 
@@ -179,11 +191,11 @@ class Launchpad extends EventEmitter {
      * @param {Array.<Number>|Array.<Array.<Number>>} buttons [x,y] value pair, or array of pairs
      * @return {Promise} Resolves as soon as the Launchpad has processed all data.
      */
-    col( color, buttons ) {
+    col( color : number | Color, buttons : number[] | number[][] ) {
         // Code would look much better with the Rest operator ...
 
         if ( buttons.length > 0 && buttons[ 0 ] instanceof Array ) {
-            buttons.forEach( btn => this.col( color, btn ) );
+            buttons.forEach( ( btn : any ) => this.col( color, btn ) );
             return new Promise( ( res, rej ) => setTimeout( res, buttons.length / 20 ) );
 
         } else {
@@ -200,12 +212,12 @@ class Launchpad extends EventEmitter {
      * @param {Array.<Array.<>>} buttonsWithColor Array containing entries of the form [x,y,color].
      * @returns {Promise}
      */
-    setColors( buttonsWithColor ) {
+    setColors( buttonsWithColor : number[][] ) {
         buttonsWithColor.forEach( btn => this.setSingleButtonColor( btn, btn[ 2 ] ) );
         return new Promise( ( res ) => setTimeout( res, buttonsWithColor.length / 20 ) );
     }
 
-    setSingleButtonColor( xy, color ) {
+    setSingleButtonColor( xy : number, color : number | Color ) {
         let b = this._button( xy );
         if ( b ) {
             this.sendRaw( [ b.cmd, b.key, color.code || color ] );
@@ -249,14 +261,11 @@ class Launchpad extends EventEmitter {
      * at a pre-defined speed.
      * @param {Boolean} flash
      */
-    set flash( flash ) {
+    set flash( flash : boolean ) {
         this.setBuffers( { flash: flash } );
     }
 
-    /**
-     * @param {{write:Number=, display:Number=, copyToDisplay:Boolean=, flash:Boolean=}=} args
-     */
-    setBuffers( args ) {
+    setBuffers( args : BufferArgs ) {
         args = args || {};
         this._flashing = or( args.flash, this._flashing );
         this._writeBuffer = 1 * or( args.write, this._writeBuffer );
@@ -278,17 +287,17 @@ class Launchpad extends EventEmitter {
      * @param {Number=} num Numerator, between 1 and 16, default=1
      * @param {Number=} den Denominator, between 3 and 18, default=5
      */
-    multiplexing( num, den ) {
+    multiplexing( num : number, den : number ) {
         let data,
             cmd;
         num = Math.max( 1, Math.min( num || 1, 16 ) );
         den = Math.max( 3, Math.min( den || 5, 18 ) );
         if ( num < 9 ) {
             cmd = 0x1e;
-            data = 0x10 * (num - 1) + (den - 3);
+            data = 0x10 * ( num - 1 ) + ( den - 3 );
         } else {
             cmd = 0x1f;
-            data = 0x10 * (num - 9) + (den - 3);
+            data = 0x10 * ( num - 9 ) + ( den - 3 );
         }
         this.sendRaw( [ 0xb0, cmd, data ] );
     }
@@ -299,7 +308,7 @@ class Launchpad extends EventEmitter {
      *
      * @param {Number} brightness Brightness between 0 (dark) and 1 (bright)
      */
-    brightness( brightness ) {
+    brightness( brightness : number ) {
         this.multiplexing.apply( this, brightnessSteps.getNumDen( brightness ) );
     }
 
@@ -315,12 +324,12 @@ class Launchpad extends EventEmitter {
      * @param {String} map
      * @returns {Array.<Array.<Number>>} Array containing [x,y] coordinate pairs.
      */
-    fromMap( map ) {
-        return Array.prototype.map.call( map, ( char, ix ) => ({
+    fromMap( map : string ) {
+        return Array.prototype.map.call( map, ( char : string, ix : number ) => ( {
             x: ix % 9,
-            y: (ix - (ix % 9)) / 9,
+            y: ( ix - ( ix % 9 ) ) / 9,
             c: char
-        }) )
+        } ) )
             .filter( data => data.c === 'x' )
             .map( data => Buttons.byXy( data.x, data.y ) );
     }
@@ -332,7 +341,7 @@ class Launchpad extends EventEmitter {
      * *pattern* are buttons from 0 to 8, where an 'x' or 'X' marks the button as selected,
      * and any other character is ignored; for example: 'x..xx' or 'X  XX'.
      */
-    fromPattern( pattern ) {
+    fromPattern( pattern : string | string[] ) {
         if ( pattern instanceof Array ) {
             return buttons.decodeStrings( pattern );
         }
@@ -341,21 +350,21 @@ class Launchpad extends EventEmitter {
     }
 
     /**
-     * @returns {{pressed: Boolean, x: Number, y: Number, cmd:Number, key:Number, id:Symbol}} Button at given coordinates
+     * @returns Button at given coordinates
      */
-    _button( xy ) {
+    _button( xy : number[] ) : ButtonInfo {
         return this._buttons[ 9 * xy[ 1 ] + xy[ 0 ] ];
     }
 
-    _processMessage( deltaTime, message ) {
+    _processMessage( deltaTime : number, message : number[] ) {
 
-        let x, y, pressed;
+        let x : number, y : number, pressed : boolean;
 
         if ( message[ 0 ] === 0x90 ) {
 
             // Grid pressed
             x = message[ 1 ] % 0x10;
-            y = (message[ 1 ] - x) / 0x10;
+            y = ( message[ 1 ] - x ) / 0x10;
             pressed = message[ 2 ] > 0;
 
         } else if ( message[ 0 ] === 0xb0 ) {
@@ -373,22 +382,30 @@ class Launchpad extends EventEmitter {
 
         let button = this._button( [ x, y ] );
         button.pressed = pressed;
-        this.emit( 'key', {
+
+        setImmediate( () => this._events.emit( Events.key, {
             x: x, y: y, pressed: pressed, id: button.id,
             // Pretend to be an array so the returned object
             // can be fed back to .col()
             0: x, 1: y, length: 2
-        } );
+        } ) );
     }
 
+    private readonly midiIn : any;
+    private readonly midiOut : any;
+
+    private readonly red : Color;
+    private readonly green : Color;
+    private readonly amber : Color;
+    private readonly yellow : Color;
+    private readonly off : Color;
+
+    private readonly _buttons : ButtonInfo[];
+
+    private _writeBuffer : number;
+    private _displayBuffer : number;
+    private _flashing : boolean;
+
+    private readonly _events = new EventEmitter;
+
 }
-
-util.inherits( Launchpad, EventEmitter );
-
-// Button Groups
-
-Launchpad.Buttons = Buttons;
-
-Launchpad.Colors = colors;
-
-module.exports = Launchpad;

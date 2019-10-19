@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^2.6.0",
+    "@types/node": "^12.11.1",
     "jasmine": "^2.4.1",
     "jasmine-console-reporter": "^2.0.1",
     "typescript": "^3.6.4"

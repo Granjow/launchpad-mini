@@ -1,28 +1,43 @@
+export interface ButtonCoordinate {
+    row : boolean;
+    nr : number;
+}
+
+export class DecodeError extends Error {
+
+}
+
+interface IntermediateCoordinate {
+    select : boolean;
+    ix : number;
+}
+
 export class Buttons {
-    static numbersFromCoords = function ( buttons ) {
-        return Array.prototype.map.call( buttons || [], ( b, ix ) => ( {
+
+    static numbersFromCoords = function ( buttons : string ) {
+        return Array.prototype.map.call( buttons || [], ( b : string, ix : number ) => ( {
             select: b === 'x' || b === 'X',
             ix: ix === 0 ? 8 : ix - 1
-        } ) )
-            .filter( b => b.select )
-            .map( b => b.ix );
+        } as IntermediateCoordinate ) )
+            .filter( ( b : IntermediateCoordinate ) => b.select )
+            .map( ( b : IntermediateCoordinate ) => b.ix );
     };
 
-    static asRow = function ( row, cols ) {
+    static asRow = function ( row : number, cols : number[] ) {
         return cols.map( col => [ row, col ] );
     };
-    static asCol = function ( col, rows ) {
+    static asCol = function ( col : number, rows : number[] ) {
         return rows.map( row => [ row, col ] );
     };
 
     /**
      * Convert a modifier to data. A modifier is a human-readable string describing a button row or column
      * on the launchpad; see the description of the modifier parameter below.
-     * @param {String} modifier Can be 'sc' for Scene buttons, 'am' for Automap buttons, 'rX' for row number X,
+     * @param modifier Can be 'sc' for Scene buttons, 'am' for Automap buttons, 'rX' for row number X,
      * or 'cX' for column number X
      * @returns {{row:Boolean, nr:Number}|{error:Boolean}}
      */
-    static decodeModifier =  ( modifier:string ) =>{
+    static decodeModifier = ( modifier : string ) : ButtonCoordinate | DecodeError => {
         let mod = ( modifier || '' ).toLowerCase(),
             nr = Number( mod[ 1 ] );
         if ( mod === 'sc' ) {
@@ -37,7 +52,7 @@ export class Buttons {
                 return { row: false, nr: Number( mod[ 1 ] ) };
             }
         }
-        return { error: true };
+        return new DecodeError();
     };
 
     /**
@@ -45,12 +60,16 @@ export class Buttons {
      * and returns the button coordinates; the first part of the coordinate is given by the modifier, the second one
      * by the number(s) following it. For example, 'r4 1 2' describes buttons 1 and 2 on row 4; the function returns
      * those coordinates.
-     * @param {String} modifier See #decodeModifier
-     * @returns {function(Array.<Number>):Array.<Number>} This function takes a number and returns a button.
+     * @param modifier See #decodeModifier
+     * @returns This function takes a number and returns a button.
      */
-    static getDecoder = function ( modifier ) {
+    static getDecoder = function ( modifier : string ) : ( n : number[] ) => number[] {
         let mod = Buttons.decodeModifier( modifier );
-        return mod.err ? () => [] : mod.row ? Buttons.asRow.bind( null, mod.nr ) : Buttons.asCol.bind( null, mod.nr )
+        if ( mod instanceof DecodeError ) {
+            return () : number[] => [];
+        } else {
+            return mod.row ? Buttons.asRow.bind( null, mod.nr ) : Buttons.asCol.bind( null, mod.nr );
+        }
     };
 
     /**
@@ -58,7 +77,7 @@ export class Buttons {
      * @param {Array.<Number>} coords
      * @returns {Array.<Number>}
      */
-    static uniqueCoords = function ( coords ) {
+    static uniqueCoords = function ( coords : number[] ) {
         return coords.sort( ( a, b ) => {
             if ( a[ 0 ] !== b[ 0 ] ) {
                 return a[ 0 ] - b[ 0 ];
@@ -74,29 +93,26 @@ export class Buttons {
 
     /**
      * Converts a string describing a row or column to button coordinates.
-     * @param {String} pattern String format is 'mod:pattern', with *mod* being
+     * @param pattern String format is 'mod:pattern', with *mod* being
      * one of rN (row N, e.g. r4), cN (column N), am (automap), sc (scene). *pattern* are buttons from 0 to 8, where an 'x' or 'X'
      * marks the button as selected, and any other character is ignored; for example: 'x..xx' or 'X  XX'.
      */
-    static decodeString = function ( pattern ) {
-        pattern = pattern || '';
+    static decodeString = function ( pattern : string ) {
         return Buttons.getDecoder( pattern.substring( 0, 2 ) )( Buttons.numbersFromCoords( pattern.substring( 2 ) ) );
     };
 
     /**
-     * @param {Array.<Array.<Number>>} arrays
-     * @returns {Array.<Number>}
+     * Matrix to vector function
      */
-    static mergeArray = function ( arrays ) {
+    static mergeArray = function ( arrays : number[][] ) : number[] {
         return arrays.reduce( ( acc, cur ) => acc.concat( cur ), [] );
     };
 
     /**
      * Like decodeString(), but for an array of patterns.
-     * @param {Array.<String>} patterns
      * @returns {Array.<Number>}
      */
-    static decodeStrings = function ( patterns ) {
+    static decodeStrings = function ( patterns : string[] ) {
         return Buttons.uniqueCoords( Buttons.mergeArray( patterns.map( Buttons.decodeString ) ) );
     };
 
