@@ -16,7 +16,7 @@ and [phi-launchpad](https://www.npmjs.com/package/phi-launchpad), which you migh
 ## Usage
 
 ```js
-const Launchpad = require( 'launchpad-mini' ),
+const Launchpad = require( 'src/launchpad-mini' ),
       pad = new Launchpad();
 
 pad.connect().then( () => {     // Auto-detect Launchpad

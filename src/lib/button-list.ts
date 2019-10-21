@@ -12,8 +12,9 @@ export class LaunchpadButtons {
     static All : ButtonItem[] = ( new Array( 80 ) ).fill( 0 )
         .map( ( empty, ix ) => [ ix % 9, ( ix - ix % 9 ) / 9 ] )
         .map( ( xy ) => {
-            xy.id = Symbol();
-            return xy;
+            const el : ButtonItem = xy as any;
+            el.id = Symbol();
+            return el;
         } );
     /**
      * Grid buttons (8×8 square buttons)
@@ -37,11 +38,11 @@ export class LaunchpadButtons {
         return map;
     } )();
 
-    static byId = ( id ) => {
+    public static byId = ( id : Symbol ) => {
         return LaunchpadButtons.mapById.get( id );
     };
 
-    static byXy = ( x, y ) => {
+    static byXy = ( x : number, y : number ) => {
         return LaunchpadButtons.All[ 9 * y + x ];
     };
 

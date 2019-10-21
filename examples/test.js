@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-const
-    Launchpad = require( '../launchpad-mini' );
+const Launchpad = require( '../src/launchpad-mini' );
 
 let pad = new Launchpad();
 
@@ -81,7 +80,7 @@ pad.connect().then( ( msg ) => {
                 pad.multiplexing();
             } else if ( pair.x === 2 ) {
                 // Fade
-                (new Array( 101 )).fill( 0 ).forEach( ( empty, ix ) => setTimeout( () => pad.brightness( ix / 100 ), ix * 20 ) );
+                ( new Array( 101 ) ).fill( 0 ).forEach( ( empty, ix ) => setTimeout( () => pad.brightness( ix / 100 ), ix * 20 ) );
             } else if ( pair.x === 4 ) {
                 // Does not update correctly for 6 or more repetitions
                 let btns = Launchpad.Buttons.Grid;

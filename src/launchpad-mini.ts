@@ -8,6 +8,15 @@ const Buttons = require( './lib/button-list' );
 const buttons = require( './lib/buttons' );
 const colors = require( './lib/colors' );
 
+/*
+TODO Use semaphore for sending data
+TODO Standard button/color objects
+   * col(color, buttons)
+   * setColors([x,y,col])
+   * isPressed : [x,y]
+TODO ButtonItem is not nice
+ */
+
 interface ButtonInfo {
     cmd : number;
     key : number;
@@ -57,7 +66,7 @@ export class Launchpad {
         this.midiIn = new midi.Input();
         this.midiOut = new midi.Output();
 
-        this.midiIn.on( 'message', ( dt : number, msg : string ) => this._processMessage( dt, msg ) );
+        this.midiIn.on( 'message', ( dt : number, msg : number[] ) => this._processMessage( dt, msg ) );
 
         /**
          * Storage format: [ {x0 y0}, {x1 y0}, ...{x9 y0}, {x0 y1}, {x1 y1}, ... ]
@@ -151,6 +160,9 @@ export class Launchpad {
         this.sendRaw( [ 0xb0, 0x00, brightness ] )
     }
 
+    /**
+     * Send a raw MIDI command
+     */
     sendRaw( data : number[] ) {
         this.midiOut.sendMessage( data );
     }
@@ -196,7 +208,7 @@ export class Launchpad {
 
         if ( buttons.length > 0 && buttons[ 0 ] instanceof Array ) {
             buttons.forEach( ( btn : any ) => this.col( color, btn ) );
-            return new Promise( ( res, rej ) => setTimeout( res, buttons.length / 20 ) );
+            return new Promise( ( res ) => setTimeout( res, buttons.length / 20 ) );
 
         } else {
             let b = this._button( buttons );

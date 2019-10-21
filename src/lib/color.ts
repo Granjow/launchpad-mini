@@ -86,14 +86,3 @@ export class Color {
     private readonly _copy : boolean;
     private readonly _name : string;
 }
-
-/** @type {Color} */
-export const red = new Color( 3, false, false, 'red' );
-/** @type {Color} */
-export const green = new Color( 3, false, false, 'green' );
-/** @type {Color} */
-export const amber = new Color( 3, false, false, 'amber' );
-/** @type {Color} */
-export const yellow = new Color( 3, false, false, 'yellow' );
-/** @type {Color} */
-export const off = new Color( 3, false, false, 'off' );

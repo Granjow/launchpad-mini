@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const Launchpad = require( '../launchpad-mini' );
+const Launchpad = require( '../src/launchpad-mini' );
 
 const sortByX = ( a, b ) => {
     if ( a[ 0 ] < b[ 0 ] ) return -1;

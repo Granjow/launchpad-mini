@@ -1,4 +1,4 @@
-var buttons = require( '../lib/buttons' );
+var buttons = require( '../src/lib/buttons' );
 describe( 'Line parser', () => {
     it( 'should recognize lowercase rows', () => {
 

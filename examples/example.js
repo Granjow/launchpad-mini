@@ -1,4 +1,4 @@
-const Launchpad = require( '../launchpad-mini' ),
+const Launchpad = require( '../src/launchpad-mini' ),
     pad = new Launchpad();
 
 pad.connect().then( () => {     // Auto-detect Launchpad

@@ -10,7 +10,7 @@
   "files": [
     "examples",
     "img",
-    "lib",
+    "src/lib",
     "launchpad-mini.js",
     "*.md"
   ],
@@ -43,8 +43,8 @@
   "devDependencies": {
     "@types/jasmine": "^2.6.0",
     "@types/node": "^12.11.1",
-    "jasmine": "^2.4.1",
-    "jasmine-console-reporter": "^2.0.1",
+    "jasmine": "^3.5.0",
+    "jasmine-console-reporter": "^3.1.0",
     "typescript": "^3.6.4"
   }
 }
