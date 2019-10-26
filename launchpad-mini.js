@@ -88,15 +88,20 @@ class Launchpad extends EventEmitter {
     /**
      * @param {Number=} port MIDI port number to use. By default, the first MIDI port where a Launchpad is found
      * will be used. See availablePorts for a list of Launchpad ports (in case more than one is connected).
+     * @param {Number} outPort MIDI output port to use, if defined, port is MIDI input port, otherwise port is both input and output port.
      */
-    connect( port ) {
+    connect( port, outPort ) {
         return new Promise( ( res, rej ) => {
 
             if ( port !== undefined ) {
+                if( outPort === undefined){
+                  // User has not specified outPort, use port also as output MIDI port.
+                  outPort = port;
+                }
                 // User has specified a port, use it
                 try {
                     this.midiIn.openPort( port );
-                    this.midiOut.openPort( port );
+                    this.midiOut.openPort( outPort );
                     this.emit( 'connect' );
                     res( 'Launchpad connected' );
                 } catch ( e ) {
