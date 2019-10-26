@@ -1,5 +1,5 @@
-import { Color } from './lib/colors';
 import { ButtonItem } from './lib/button-list';
+import { Color } from './lib/color';
 
 const EventEmitter = require( 'events' );
 const midi = require( 'midi' );
@@ -203,7 +203,7 @@ export class Launchpad {
      * @param {Array.<Number>|Array.<Array.<Number>>} buttons [x,y] value pair, or array of pairs
      * @return {Promise} Resolves as soon as the Launchpad has processed all data.
      */
-    col( color : number | Color, buttons : number[] | number[][] ) {
+    col( color : Color, buttons : number[] | number[][] ) {
         // Code would look much better with the Rest operator ...
 
         if ( buttons.length > 0 && buttons[ 0 ] instanceof Array ) {
@@ -213,7 +213,7 @@ export class Launchpad {
         } else {
             let b = this._button( buttons );
             if ( b ) {
-                this.sendRaw( [ b.cmd, b.key, color.code || color ] );
+                this.sendRaw( [ b.cmd, b.key, color.code ] );
             }
             return Promise.resolve( !!b );
         }

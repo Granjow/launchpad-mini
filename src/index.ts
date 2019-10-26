@@ -14,6 +14,8 @@ export interface ButtonWithColor {
 
 export interface LaunchpadMini {
 
+    connect( port? : number ) : void;
+
     reset( brightness : number ) : void;
 
     pressedButtons() : Button[];
