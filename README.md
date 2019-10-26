@@ -1,7 +1,7 @@
 JavaScript library for interacting with the Novation’s midi board LAUNCHPAD MINI.
 
 This library is based on ES6 and works with `Promise`s. It also *auto-detects* you Launchpad and provides
-accurate documentation of the library and the Launchpad itself. For latter, check the 
+accurate documentation of the library and the Launchpad itself. For latter, check the
 [git repository](https://github.com/Granjow/launchpad-mini/tree/master/doc).
 
 This yet-another-lauchpad-library exists because other libraries did not compile, did not start,
@@ -33,7 +33,7 @@ pad.connect().then( () => {     // Auto-detect Launchpad
     npm install --save launchpad-mini
 
 Node.js >=4.8.4 is required. Also, `launchpad-mini` depends on [midi](https://www.npmjs.com/package/midi); see the requirements for your OS there.
-On Linux, usually install `libasound2-dev` and you are good. 
+On Linux, usually install `libasound2-dev` and you are good.
 
 ## Documentation
 
@@ -41,7 +41,7 @@ Product page: [Novation Launchpad Mini](https://global.novationmusic.com/launch/
 
 Novation provides a reference on [their download page](https://global.novationmusic.com/support/product-downloads?product=Launchpad)
 (direct link: [Launchpad MK2 Programmer’s Reference Manual](https://global.novationmusic.com/sites/default/files/novation/downloads/10529/launchpad-mk2-programmers-reference-guide_0.pdf))
-describing the MIDI interface of the Launchpad MK2 models. 
+describing the MIDI interface of the Launchpad MK2 models.
 
 For the Launchpad Mini, see the Programmer’s Manual in this repository’s `doc/` subdirectory. It is also
 written by Novation, but for some reason it is not available on their web site.
@@ -235,10 +235,10 @@ Launchpad.Buttons.Scene     // Scene buttons (right row)
 
 ### Methods
 
-#### pad.connect( port )
+#### pad.connect( port, outPort )
 
-Connects to the launchpad. The MIDI `port` can optionally be specified; if not given, the first Launchpad that is found
-is taken. Returns an ES6 Promise.
+Connects to the launchpad. The MIDI `port` and `outPort` can optionally be specified; if not given, the first Launchpad that is found
+is taken. If only `port` is specified, use it as both input and output port. If both are specified `port` is used as MIDI input port and `outPort` is used as MIDI output port. Returns an ES6 Promise.
 
 ```js
 pad.connect().then( () => {
@@ -259,7 +259,7 @@ Probably useful if you have more than one Launchpad connected.
 
 #### pad.reset( brightness )
 
-Resets the pad's mapping mode, buffer settings, and duty cycle. The optional `brightness` parameter sets all LEDs 
+Resets the pad's mapping mode, buffer settings, and duty cycle. The optional `brightness` parameter sets all LEDs
 to the defined brightness between `1` (low) and `3` (high), other values switch the LEDs off.
 
 ```js
@@ -268,7 +268,7 @@ pad.reset(); // Turn off all LEDs
 
 #### pad.col( color, buttons ): Promise
 
-Sets the color for the given buttons. The `buttons` parameter is either a value pair `[0,0]` to `[8,8]` specifying 
+Sets the color for the given buttons. The `buttons` parameter is either a value pair `[0,0]` to `[8,8]` specifying
 a single button, or an array of such pairs. Example:
 
 ```js
@@ -326,7 +326,7 @@ pad.setColors( [
     [ 1, 1, Launchpad.Colors.red ],
     [ 2, 2, Launchpad.Colors.amber ]
 ] ).then( () => console.log( 'Colors updated.' ) );
-``` 
+```
 
 ---
 
