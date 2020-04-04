@@ -240,6 +240,9 @@ Launchpad.Buttons.Scene     // Scene buttons (right row)
 Connects to the launchpad. The MIDI `port` and `outPort` can optionally be specified; if not given, the first Launchpad that is found
 is taken. If only `port` is specified, use it as both input and output port. If both are specified `port` is used as MIDI input port and `outPort` is used as MIDI output port. Returns an ES6 Promise.
 
+**Important:** When exiting, make sure to disconnect the port again, or you may observe effects like the MIDI port
+being blocked until the next restart on Windows.
+
 ```js
 pad.connect().then( () => {
     // Connected; do something!
@@ -549,3 +552,14 @@ pad.fromMap(
 `binary.js` Allows you to set an 8 bit integer's binary digits, and show the resulting number on the pad.
 
 `example.js` Pressed buttons become red, released buttons become green.
+
+
+## Changelog
+
+### v2.3.1  – 2020-04-04
+
+This release only adds a note to the documentation to use `disconnect()` on exit.
+
+### v2.3.0 – 2019-10-26
+
+* Add option to specifiy a separate output port in `connect()`.
