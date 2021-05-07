@@ -1,4 +1,24 @@
 export = Launchpad;
+
+interface AvailablePorts 
+{
+    input: {
+        portNumber: number;
+        portName: string;
+    }[];
+    output: {
+        portNumber: number;
+        portName: string;
+    }[];
+}
+
+interface SetBuffersArgs
+{
+    write: number;
+    display: number;
+    copyToDisplay: boolean;
+    flash: boolean;
+}
 declare class Launchpad {
     midiIn: any;
     midiOut: any;
@@ -57,16 +77,7 @@ declare class Launchpad {
      * @returns {{input: Array.<{portNumber:Number, portName:String}>, output: Array.<{portNumber:Number, portName:String}>}}
      * Available input and output ports with a connected Launchpad; no other MIDI devices are shown.
      */
-    get availablePorts(): {
-        input: {
-            portNumber: number;
-            portName: string;
-        }[];
-        output: {
-            portNumber: number;
-            portName: string;
-        }[];
-    };
+    get availablePorts(): AvailablePorts
     /**
      * Get a list of buttons which are currently pressed.
      * @returns {Array.<Array.<Number>>} Array containing [x,y] pairs of pressed buttons
@@ -120,19 +131,14 @@ declare class Launchpad {
     /**
      * @param {{write:Number=, display:Number=, copyToDisplay:Boolean=, flash:Boolean=}=} args
      */
-    setBuffers(args?: {
-        write: number;
-        display: number;
-        copyToDisplay: boolean;
-        flash: boolean;
-    }): void;
+    setBuffers(args?: SetBuffersArgs): void;
     /**
      * Set the low/medium button brightness. Low brightness buttons are about `num/den` times as bright
      * as full brightness buttons. Medium brightness buttons are twice as bright as low brightness.
      * @param {Number=} num Numerator, between 1 and 16, default=1
      * @param {Number=} den Denominator, between 3 and 18, default=5
      */
-    multiplexing(num?: number | undefined, den?: number | undefined): void;
+    multiplexing(num?: number, den?: number): void;
     /**
      * Set the button brightness for buttons with non-full brightness.
      * Lower brightness increases contrast since the full-brightness buttons will not change.
