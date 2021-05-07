@@ -19,6 +19,7 @@ interface SetBuffersArgs
     copyToDisplay: boolean;
     flash: boolean;
 }
+
 declare class Launchpad {
     midiIn: any;
     midiOut: any;
@@ -54,6 +55,9 @@ declare class Launchpad {
     yellow: any;
     /** @type {Color} */
     off: any;
+
+    on(event: string, callback: (data: any) => void): void;
+
     /**
      * @param {Number=} port MIDI port number to use. By default, the first MIDI port where a Launchpad is found
      * will be used. See availablePorts for a list of Launchpad ports (in case more than one is connected).
