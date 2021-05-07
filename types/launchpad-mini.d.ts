@@ -56,7 +56,7 @@ declare class Launchpad {
     /** @type {Color} */
     off: any;
 
-    on(event: string, callback: (data: any) => void): void;
+    on(event: "connect" | "disconnect" | "key", callback: (data: any) => void): void;
 
     /**
      * @param {Number=} port MIDI port number to use. By default, the first MIDI port where a Launchpad is found
