@@ -556,7 +556,11 @@ pad.fromMap(
 
 ## Changelog
 
-### v2.3.1  – 2020-04-04
+### v2.3.3 – 2021-05-11
+
+This release adds types for TypeScript.
+
+### v2.3.1 – 2020-04-04
 
 This release only adds a note to the documentation to use `disconnect()` on exit.
 
