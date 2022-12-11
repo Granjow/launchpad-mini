@@ -1,6 +1,6 @@
 {
   "name": "launchpad-mini",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "license": "MIT",
   "author": {
     "name": "Simon A. Eugster",
@@ -36,15 +36,15 @@
     "midi"
   ],
   "dependencies": {
-    "midi": "^1.0.0"
+    "midi": "^2.0.0"
   },
   "engines": {
-    "node": ">=5.0.0"
+    "node": ">=10.0.0"
   },
   "types": "./types/launchpad-mini.d.ts",
   "devDependencies": {
-    "@types/jasmine": "^2.6.0",
-    "jasmine": "^2.4.1",
-    "jasmine-console-reporter": "^2.0.1"
+    "@types/jasmine": "^4.3.1",
+    "jasmine": "^4.5.0",
+    "jasmine-console-reporter": "^3.1.0"
   }
 }

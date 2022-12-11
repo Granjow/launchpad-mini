@@ -556,6 +556,10 @@ pad.fromMap(
 
 ## Changelog
 
+### v2.4.0 – 2022-12-11
+
+Update dependencies so `launchpad-mini` works on Node.js 18. It requires Node.js 10 or newer.
+
 ### v2.3.3 – 2021-05-11
 
 This release adds types for TypeScript.
